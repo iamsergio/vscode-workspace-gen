@@ -1,0 +1,23 @@
+# SPDX-License-Identifier: MIT
+
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Rust
+        run: |
+          cargo test
+
