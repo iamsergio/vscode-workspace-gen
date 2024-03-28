@@ -23,7 +23,18 @@ fn main() {
     match workspace::generate_from_file(args.filename, target_filename) {
         Ok(_) => println!("Workspace generated successfully"),
         Err(e) => {
-            eprintln!("Error: {:?}", e);
+            match e {
+                workspace::Error::ExpectedRootObject => {
+                    eprintln!("Error: Expected root object in JSON file");
+                }
+                workspace::Error::IoError(e) => {
+                    eprintln!("Error: {:?}", e);
+                }
+                workspace::Error::JsonError(e) => {
+                    eprintln!("Error: {:?}", e);
+                }
+            }
+
             process::exit(-1);
         }
     }
