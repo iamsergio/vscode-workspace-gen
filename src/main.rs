@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+use std::process;
+
 use clap::Parser;
 
 mod workspace;
@@ -16,5 +18,11 @@ fn main() {
     let args = Args::parse();
 
     let workspace = Workspace::new(args.filename);
-    workspace.generate();
+    match workspace.generate() {
+        Ok(_) => println!("Workspace generated successfully"),
+        Err(e) => {
+            eprintln!("Error: {:?}", e);
+            process::exit(-1);
+        }
+    }
 }
