@@ -5,33 +5,30 @@ use serde_json::{ser::PrettyFormatter, Serializer};
 
 #[derive(Debug)]
 pub enum Error {
-    IoError(std::io::Error),
-    JsonError(serde_json::Error),
+    Io(std::io::Error),
+    Json(serde_json::Error),
     ExpectedRootObject,
 }
 
 pub fn generate_from_file(template_filename: String, target_filename: String) -> Result<(), Error> {
     // call generate with the contents of the file
-    let template_contents =
-        std::fs::read_to_string(&template_filename).map_err(|e| Error::IoError(e))?;
+    let template_contents = std::fs::read_to_string(template_filename).map_err(Error::Io)?;
 
     let new_json = generate_from_string(&template_contents)?;
 
     // write json to target file
-    let target_file = std::fs::File::create(&target_filename).map_err(|e| Error::IoError(e))?;
+    let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
 
     let formatter = PrettyFormatter::with_indent(b"    ");
     let mut serializer = Serializer::with_formatter(target_file, formatter);
-    new_json
-        .serialize(&mut serializer)
-        .map_err(|e| Error::JsonError(e))?;
+    new_json.serialize(&mut serializer).map_err(Error::Json)?;
 
     Ok(())
 }
 
-pub fn generate_from_string(template_contents: &String) -> Result<serde_json::Value, Error> {
+pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value, Error> {
     let mut json: serde_json::Value =
-        serde_json::from_str(template_contents).map_err(|e| Error::JsonError(e))?;
+        serde_json::from_str(template_contents).map_err(Error::Json)?;
 
     if !json.is_object() {
         return Err(Error::ExpectedRootObject);
@@ -53,7 +50,7 @@ fn replace_globals(
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
         let s = value.as_str().unwrap();
-        if s.starts_with("@{") && s.ends_with("}") {
+        if s.starts_with("@{") && s.ends_with('}') {
             let key = &s[2..s.len() - 1];
             if let Some(globals) = globals {
                 if let Some(global_value) = globals.get(key) {
@@ -90,11 +87,11 @@ mod tests {
         let result = generate_from_file("unknown.template".to_string(), "unknown".to_string());
         assert!(result.is_err());
         match result {
-            Err(Error::IoError(e)) => match e.kind() {
+            Err(Error::Io(e)) => match e.kind() {
                 std::io::ErrorKind::NotFound => (),
-                _ => assert!(false, "Expected NotFound"),
+                _ => panic!("Expected NotFound"),
             },
-            _ => assert!(false, "Expected IoError"),
+            _ => panic!("Expected IoError"),
         }
     }
 

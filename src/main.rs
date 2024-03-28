@@ -27,10 +27,10 @@ fn main() {
                 workspace::Error::ExpectedRootObject => {
                     eprintln!("Error: Expected root object in JSON file");
                 }
-                workspace::Error::IoError(e) => {
+                workspace::Error::Io(e) => {
                     eprintln!("Error: {:?}", e);
                 }
-                workspace::Error::JsonError(e) => {
+                workspace::Error::Json(e) => {
                     eprintln!("Error: {:?}", e);
                 }
             }
