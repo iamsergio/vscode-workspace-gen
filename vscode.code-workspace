@@ -1,13 +1,11 @@
 {
-    "folders": [
-        {
-            "path": "."
-        }
-    ],
     "launch": {
+        "version": "0.2.0",
         "configurations": [
             {
-                "args": [],
+                "type": "lldb",
+                "request": "launch",
+                "name": "vscode-workspace-gen",
                 "cargo": {
                     "args": [
                         "build",
@@ -15,17 +13,17 @@
                         "--package=vscode-workspace-gen"
                     ],
                     "filter": {
-                        "kind": "bin",
-                        "name": "vscode-workspace-gen"
+                        "name": "vscode-workspace-gen",
+                        "kind": "bin"
                     }
                 },
-                "cwd": "${workspaceFolder}",
-                "name": "vscode-workspace-gen",
-                "request": "launch",
-                "type": "lldb"
+                "args": [],
+                "cwd": "${workspaceFolder}"
             },
             {
-                "args": [],
+                "type": "lldb",
+                "request": "launch",
+                "name": "tests",
                 "cargo": {
                     "args": [
                         "test",
@@ -34,17 +32,17 @@
                         "--package=vscode-workspace-gen"
                     ],
                     "filter": {
-                        "kind": "bin",
-                        "name": "vscode-workspace-gen"
+                        "name": "vscode-workspace-gen",
+                        "kind": "bin"
                     }
                 },
-                "cwd": "${workspaceFolder}",
-                "name": "tests",
-                "request": "launch",
-                "type": "lldb"
+                "args": [],
+                "cwd": "${workspaceFolder}"
             },
             {
-                "args": [],
+                "type": "lldb",
+                "request": "launch",
+                "name": "tests ASAN",
                 "cargo": {
                     "args": [
                         "+nightly",
@@ -56,21 +54,23 @@
                         "--target=x86_64-unknown-linux-gnu"
                     ],
                     "filter": {
-                        "kind": "bin",
-                        "name": "vscode-workspace-gen"
+                        "name": "vscode-workspace-gen",
+                        "kind": "bin"
                     }
                 },
+                "args": [],
                 "cwd": "${workspaceFolder}",
                 "env": {
                     "RUSTFLAGS": "-Zsanitizer=address"
-                },
-                "name": "tests ASAN",
-                "request": "launch",
-                "type": "lldb"
+                }
             }
-        ],
-        "version": "0.2.0"
+        ]
     },
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
     "settings": {
         "editor.formatOnSave": true,
         "files.associations": {
