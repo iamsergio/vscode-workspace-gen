@@ -14,10 +14,15 @@ struct Args {
     filename: String,
 }
 
+fn suggest_target_filename(template_filename: &str) -> String {
+    template_filename.to_string().replace(".template", "")
+}
+
 fn main() {
     let args = Args::parse();
 
-    let workspace = Workspace::new(args.filename);
+    let target_filename = suggest_target_filename(&args.filename);
+    let workspace = Workspace::new(args.filename, target_filename);
     match workspace.generate() {
         Ok(_) => println!("Workspace generated successfully"),
         Err(e) => {
