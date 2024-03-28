@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+
+name: Lints
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: fmt
+        run: |
+          cargo fmt --check
+
