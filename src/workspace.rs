@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: MIT
 
+use serde::Serialize;
+use serde_json::{ser::PrettyFormatter, Serializer};
+
 #[derive(Debug)]
 pub enum Error {
     IoError(std::io::Error),
@@ -17,7 +20,11 @@ pub fn generate_from_file(template_filename: String, target_filename: String) ->
     // write json to target file
     let target_file = std::fs::File::create(&target_filename).map_err(|e| Error::IoError(e))?;
 
-    serde_json::to_writer_pretty(target_file, &new_json).map_err(|e| Error::JsonError(e))?;
+    let formatter = PrettyFormatter::with_indent(b"    ");
+    let mut serializer = Serializer::with_formatter(target_file, formatter);
+    new_json
+        .serialize(&mut serializer)
+        .map_err(|e| Error::JsonError(e))?;
 
     Ok(())
 }
