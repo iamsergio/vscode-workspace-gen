@@ -8,6 +8,10 @@ exclude = [
     ".github/*",
     "vscode*"
 ]
+homepage = "https://github.com/iamsergio/vscode-workspace-gen"
+repository = "https://github.com/iamsergio/vscode-workspace-gen"
+license = "MIT"
+license-file = "LICENSE"
 
 [dependencies]
 clap = { version = "4.5.0", features = ["derive"] }
