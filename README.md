@@ -61,6 +61,19 @@ and get:
 ```
 
 
+## Special fields
+
+### gen.description
+
+You can add descriptions in your template objects. They won't be present in the output.
+
+
+```
+"obj1": {
+    "gen.description" : "Some field with some purpose"
+}
+```
+
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/lints.yml/badge.svg)

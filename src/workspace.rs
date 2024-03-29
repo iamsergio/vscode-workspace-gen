@@ -3,6 +3,8 @@
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
 
+const GEN_DESCRIPTION_KEY: &str = "gen.description";
+
 #[derive(Debug)]
 pub enum Error {
     Io(std::io::Error),
@@ -34,12 +36,28 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
         return Err(Error::ExpectedRootObject);
     }
 
+    discard_descriptions(&mut json["globals"]);
+
     let globals = json["globals"].as_object().cloned();
     json.as_object_mut().unwrap().remove("globals");
 
     replace_globals(&mut json, &globals)?;
 
     Ok(json)
+}
+
+pub fn discard_descriptions(value: &mut serde_json::Value) {
+    if value.is_object() {
+        let obj = value.as_object_mut().unwrap();
+        obj.remove(GEN_DESCRIPTION_KEY);
+        for (_, v) in obj {
+            discard_descriptions(v);
+        }
+    } else if value.is_array() {
+        for v in value.as_array_mut().unwrap() {
+            discard_descriptions(v);
+        }
+    }
 }
 
 /// On success, returns whether any globals were replaced (bool).
@@ -184,6 +202,36 @@ mod tests {
 
         let result = generate_from_string(&String::from(template)).unwrap();
 
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn test_obtest_gen_description() {
+        let template = r#"{
+            "globals": {
+                "foo": {
+                    "one": 1,
+                    "gen.description": "This is a description"
+                },
+                "empty": {}
+            },
+            "obj": {
+                "l1": "@{foo}"
+            }
+        }"#;
+
+        let expected: Value = serde_json::from_str(
+            r#"{
+            "obj": {
+                "l1": {
+                    "one": 1
+                }
+            }
+        }"#,
+        )
+        .unwrap();
+
+        let result = generate_from_string(&String::from(template)).unwrap();
         assert_eq!(result, expected);
     }
 }
