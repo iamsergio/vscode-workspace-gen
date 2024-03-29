@@ -19,6 +19,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install git-cliff
+        run: cargo install git-cliff
+
       - name: Run release-plz
         uses: MarcoIeni/release-plz-action@v0.5
         env:
