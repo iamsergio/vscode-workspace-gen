@@ -6,6 +6,9 @@ use clap::Parser;
 
 mod workspace;
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
