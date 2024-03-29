@@ -118,29 +118,30 @@ fn replace_nesteds(
         }
 
         // expand $${key} instances
-        let mut new_array = serde_json::Value::Array(vec![]);
+        let mut new_array_value = serde_json::Value::Array(vec![]);
+        let new_array = new_array_value.as_array_mut().unwrap();
         for v in value.as_array().unwrap() {
             if v.is_string() {
                 if let TokenKind::Inplace(key) = token_kind(v) {
                     if let Some(global_value) = globals.get(key.as_str()) {
                         if global_value.is_array() {
                             for gv in global_value.as_array().unwrap() {
-                                new_array.as_array_mut().unwrap().push(gv.clone());
+                                new_array.push(gv.clone());
                             }
                         } else {
-                            new_array.as_array_mut().unwrap().push(global_value.clone());
+                            new_array.push(global_value.clone());
                         }
                     } else {
                         println!("No replacement found for key: {}", key);
-                        new_array.as_array_mut().unwrap().push(v.clone());
+                        new_array.push(v.clone());
                     }
                 }
             } else {
-                new_array.as_array_mut().unwrap().push(v.clone());
+                new_array.push(v.clone());
             }
         }
 
-        *value = new_array;
+        *value = serde_json::Value::Array(new_array.to_vec());
     } else if value.is_object() {
         for (_, v) in value.as_object_mut().unwrap() {
             replace_nesteds(v, globals)?;
