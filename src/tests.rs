@@ -169,12 +169,18 @@ fn test_inline_list_expand() {
 
 #[test]
 fn test_token_kind() {
-    assert_eq!(token_kind("@{key}"), TokenKind::Nested("key".to_string()));
-    assert_eq!(token_kind("@@{key}"), TokenKind::Inplace("key".to_string()));
-    assert_eq!(token_kind("@{}"), TokenKind::None);
-    assert_eq!(token_kind("@@{}"), TokenKind::None);
-    assert_eq!(token_kind("@{"), TokenKind::None);
-    assert_eq!(token_kind("key}"), TokenKind::None);
-    assert_eq!(token_kind("key"), TokenKind::None);
-    assert_eq!(token_kind(""), TokenKind::None);
+    assert_eq!(
+        token_kind_from_str("@{key}"),
+        TokenKind::Nested("key".to_string())
+    );
+    assert_eq!(
+        token_kind_from_str("@@{key}"),
+        TokenKind::Inplace("key".to_string())
+    );
+    assert_eq!(token_kind_from_str("@{}"), TokenKind::None);
+    assert_eq!(token_kind_from_str("@@{}"), TokenKind::None);
+    assert_eq!(token_kind_from_str("@{"), TokenKind::None);
+    assert_eq!(token_kind_from_str("key}"), TokenKind::None);
+    assert_eq!(token_kind_from_str("key"), TokenKind::None);
+    assert_eq!(token_kind_from_str(""), TokenKind::None);
 }

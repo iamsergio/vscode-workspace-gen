@@ -68,7 +68,7 @@ pub enum TokenKind {
     None,
 }
 
-pub fn token_kind(s: &str) -> TokenKind {
+pub fn token_kind_from_str(s: &str) -> TokenKind {
     if s == "@{}" || s == "@@{}" {
         // We need a key name
         return TokenKind::None;
@@ -83,6 +83,14 @@ pub fn token_kind(s: &str) -> TokenKind {
     }
 }
 
+pub fn token_kind(value: &serde_json::Value) -> TokenKind {
+    if value.is_string() {
+        return token_kind_from_str(value.as_str().unwrap());
+    }
+
+    TokenKind::None
+}
+
 /// Replaces "${key}" instances
 fn replace_nesteds(
     value: &mut serde_json::Value,
@@ -91,7 +99,7 @@ fn replace_nesteds(
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
 
-        match token_kind(value.as_str().unwrap()) {
+        match token_kind(value) {
             TokenKind::Nested(key) => {
                 if let Some(global_value) = globals.get(key.as_str()) {
                     *value = global_value.clone();
@@ -113,7 +121,7 @@ fn replace_nesteds(
         let mut new_array = serde_json::Value::Array(vec![]);
         for v in value.as_array().unwrap() {
             if v.is_string() {
-                if let TokenKind::Inplace(key) = token_kind(v.as_str().unwrap()) {
+                if let TokenKind::Inplace(key) = token_kind(v) {
                     if let Some(global_value) = globals.get(key.as_str()) {
                         if global_value.is_array() {
                             for gv in global_value.as_array().unwrap() {
