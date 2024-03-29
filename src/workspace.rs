@@ -101,8 +101,8 @@ fn replace_nesteds(
 
         match token_kind(value) {
             TokenKind::Nested(key) => {
-                if let Some(global_value) = globals.get(key.as_str()) {
-                    *value = global_value.clone();
+                if let Some(replacement_value) = globals.get(key.as_str()) {
+                    *value = replacement_value.clone();
                 } else {
                     println!("No replacement found for key: {}", key);
                 }
@@ -123,13 +123,13 @@ fn replace_nesteds(
         for v in value.as_array().unwrap() {
             if v.is_string() {
                 if let TokenKind::Inplace(key) = token_kind(v) {
-                    if let Some(global_value) = globals.get(key.as_str()) {
-                        if global_value.is_array() {
-                            for gv in global_value.as_array().unwrap() {
+                    if let Some(replacement_value) = globals.get(key.as_str()) {
+                        if replacement_value.is_array() {
+                            for gv in replacement_value.as_array().unwrap() {
                                 new_array.push(gv.clone());
                             }
                         } else {
-                            new_array.push(global_value.clone());
+                            new_array.push(replacement_value.clone());
                         }
                     } else {
                         println!("No replacement found for key: {}", key);
