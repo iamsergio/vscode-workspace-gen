@@ -60,22 +60,48 @@ pub fn discard_descriptions(value: &mut serde_json::Value) {
     }
 }
 
+// Argument is the key
+#[derive(Debug, PartialEq)]
+pub enum TokenKind {
+    Nested(String),  // @{key}
+    Inplace(String), // @@{key}
+    None,
+}
+
+pub fn token_kind(s: &str) -> TokenKind {
+    if s == "@{}" || s == "@@{}" {
+        // We need a key name
+        return TokenKind::None;
+    }
+
+    if s.starts_with("@{") && s.ends_with('}') {
+        TokenKind::Nested(s[2..s.len() - 1].to_string())
+    } else if s.starts_with("@@{") && s.ends_with('}') {
+        TokenKind::Inplace(s[3..s.len() - 1].to_string())
+    } else {
+        TokenKind::None
+    }
+}
+
 fn replace_globals(
     value: &mut serde_json::Value,
     globals: &serde_json::Map<String, serde_json::Value>,
 ) -> Result<(), Error> {
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
-        let s = value.as_str().unwrap();
-        if s.starts_with("@{") && s.ends_with('}') {
-            let key = &s[2..s.len() - 1];
 
-            if let Some(global_value) = globals.get(key) {
-                *value = global_value.clone();
-            } else {
-                println!("No replacement found for key: {}", key);
+        match token_kind(value.as_str().unwrap()) {
+            TokenKind::Nested(key) => {
+                if let Some(global_value) = globals.get(key.as_str()) {
+                    *value = global_value.clone();
+                } else {
+                    println!("No replacement found for key: {}", key);
+                }
             }
+            TokenKind::Inplace(_) => (),
+            TokenKind::None => (),
         }
+
         return Ok(());
     } else if value.is_array() {
         for v in value.as_array_mut().unwrap() {

@@ -168,4 +168,14 @@ fn test_inner_expand() {
     assert_eq!(result, expected);
 }
 
-// }
+#[test]
+fn test_token_kind() {
+    assert_eq!(token_kind("@{key}"), TokenKind::Nested("key".to_string()));
+    assert_eq!(token_kind("@@{key}"), TokenKind::Inplace("key".to_string()));
+    assert_eq!(token_kind("@{}"), TokenKind::None);
+    assert_eq!(token_kind("@@{}"), TokenKind::None);
+    assert_eq!(token_kind("@{"), TokenKind::None);
+    assert_eq!(token_kind("key}"), TokenKind::None);
+    assert_eq!(token_kind("key"), TokenKind::None);
+    assert_eq!(token_kind(""), TokenKind::None);
+}
