@@ -139,7 +139,7 @@ fn test_gen_description() {
 }
 
 #[test]
-fn test_inner_expand() {
+fn test_inline_list_expand() {
     let template = r#"{
         "globals": {
             "foo": {
