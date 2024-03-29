@@ -137,4 +137,35 @@ fn test_gen_description() {
     let result = generate_from_string(&String::from(template)).unwrap();
     assert_eq!(result, expected);
 }
+
+#[test]
+#[ignore]
+fn test_inner_expand() {
+    let template = r#"{
+        "globals": {
+            "foo": {
+                "one": 1
+            },
+            "list" : [10, 20, 30]
+        },
+        "obj": {
+            "somelist1" : [1, 2, 3, "@{list}"],
+            "somelist2" : [1, 2, 3, "@@{list}"]
+        }
+    }"#;
+
+    let expected: Value = serde_json::from_str(
+        r#"{
+        "obj": {
+            "somelist1" : [1, 2, 3, 10, 20, 30],
+            "somelist2" : [1, 2, 3, [10, 20, 30]]
+        }
+    }"#,
+    )
+    .unwrap();
+
+    let result = generate_from_string(&String::from(template)).unwrap();
+    assert_eq!(result, expected);
+}
+
 // }
