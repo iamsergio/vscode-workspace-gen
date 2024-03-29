@@ -38,10 +38,10 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
     // Remove "gen.description" keys
     discard_descriptions(&mut json["globals"]);
 
-    let globals = json["globals"].as_object().cloned();
-    json.as_object_mut().unwrap().remove("globals");
-
-    replace_globals(&mut json, &globals)?;
+    if let Some(globals) = json["globals"].as_object().cloned() {
+        json.as_object_mut().unwrap().remove("globals");
+        replace_globals(&mut json, &globals)?;
+    }
 
     Ok(json)
 }
@@ -62,21 +62,18 @@ pub fn discard_descriptions(value: &mut serde_json::Value) {
 
 fn replace_globals(
     value: &mut serde_json::Value,
-    globals: &Option<serde_json::Map<String, serde_json::Value>>,
+    globals: &serde_json::Map<String, serde_json::Value>,
 ) -> Result<(), Error> {
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
         let s = value.as_str().unwrap();
         if s.starts_with("@{") && s.ends_with('}') {
             let key = &s[2..s.len() - 1];
-            if let Some(globals) = globals {
-                if let Some(global_value) = globals.get(key) {
-                    *value = global_value.clone();
-                } else {
-                    println!("No globals found for key: {}", key);
-                }
+
+            if let Some(global_value) = globals.get(key) {
+                *value = global_value.clone();
             } else {
-                println!("No globals found for key: {}", key);
+                println!("No replacement found for key: {}", key);
             }
         }
         return Ok(());
