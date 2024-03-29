@@ -138,7 +138,7 @@ fn replace_nesteds(
             }
         }
 
-        *value = serde_json::Value::Array(new_array.to_vec());
+        *value = new_array_value;
     } else if value.is_object() {
         for (_, v) in value.as_object_mut().unwrap() {
             replace_nesteds(v, globals)?;
