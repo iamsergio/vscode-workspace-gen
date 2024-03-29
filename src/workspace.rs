@@ -20,7 +20,6 @@ pub fn generate_from_file(template_filename: String, target_filename: String) ->
 
     // write json to target file
     let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
-
     let formatter = PrettyFormatter::with_indent(b"    ");
     let mut serializer = Serializer::with_formatter(target_file, formatter);
     new_json.serialize(&mut serializer).map_err(Error::Json)?;
@@ -36,6 +35,7 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
         return Err(Error::ExpectedRootObject);
     }
 
+    // Remove "gen.description" keys
     discard_descriptions(&mut json["globals"]);
 
     let globals = json["globals"].as_object().cloned();
@@ -60,7 +60,6 @@ pub fn discard_descriptions(value: &mut serde_json::Value) {
     }
 }
 
-/// On success, returns whether any globals were replaced (bool).
 fn replace_globals(
     value: &mut serde_json::Value,
     globals: &Option<serde_json::Map<String, serde_json::Value>>,
