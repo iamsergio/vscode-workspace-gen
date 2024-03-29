@@ -157,8 +157,8 @@ fn test_inner_expand() {
     let expected: Value = serde_json::from_str(
         r#"{
         "obj": {
-            "somelist1" : [1, 2, 3, 10, 20, 30],
-            "somelist2" : [1, 2, 3, [10, 20, 30]]
+            "somelist1" : [1, 2, 3, [10, 20, 30]],
+            "somelist2" : [1, 2, 3, 10, 20, 30]
         }
     }"#,
     )
