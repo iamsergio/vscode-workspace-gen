@@ -109,7 +109,7 @@ fn test_obj_replacements() {
 }
 
 #[test]
-fn test_obtest_gen_description() {
+fn test_gen_description() {
     let template = r#"{
         "globals": {
             "foo": {
