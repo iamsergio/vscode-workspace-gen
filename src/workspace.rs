@@ -40,7 +40,7 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
 
     if let Some(globals) = json["globals"].as_object().cloned() {
         json.as_object_mut().unwrap().remove("globals");
-        replace_globals(&mut json, &globals)?;
+        replace_nesteds(&mut json, &globals)?;
     }
 
     Ok(json)
@@ -83,7 +83,8 @@ pub fn token_kind(s: &str) -> TokenKind {
     }
 }
 
-fn replace_globals(
+/// Replaces "${key}" instances
+fn replace_nesteds(
     value: &mut serde_json::Value,
     globals: &serde_json::Map<String, serde_json::Value>,
 ) -> Result<(), Error> {
@@ -105,11 +106,36 @@ fn replace_globals(
         return Ok(());
     } else if value.is_array() {
         for v in value.as_array_mut().unwrap() {
-            replace_globals(v, globals)?;
+            replace_nesteds(v, globals)?;
         }
+
+        // expand $${key} instances
+        let mut new_array = serde_json::Value::Array(vec![]);
+        for v in value.as_array().unwrap() {
+            if v.is_string() {
+                if let TokenKind::Inplace(key) = token_kind(v.as_str().unwrap()) {
+                    if let Some(global_value) = globals.get(key.as_str()) {
+                        if global_value.is_array() {
+                            for gv in global_value.as_array().unwrap() {
+                                new_array.as_array_mut().unwrap().push(gv.clone());
+                            }
+                        } else {
+                            new_array.as_array_mut().unwrap().push(global_value.clone());
+                        }
+                    } else {
+                        println!("No replacement found for key: {}", key);
+                        new_array.as_array_mut().unwrap().push(v.clone());
+                    }
+                }
+            } else {
+                new_array.as_array_mut().unwrap().push(v.clone());
+            }
+        }
+
+        *value = new_array;
     } else if value.is_object() {
         for (_, v) in value.as_object_mut().unwrap() {
-            replace_globals(v, globals)?;
+            replace_nesteds(v, globals)?;
         }
     }
 

@@ -61,7 +61,7 @@ and get:
 ```
 
 
-## Special fields
+## Syntax
 
 ### gen.description
 
@@ -73,6 +73,33 @@ You can add descriptions in your template objects. They won't be present in the 
     "gen.description" : "Some field with some purpose"
 }
 ```
+
+### inline expansion and nested expansion
+
+Inline expansion, `@@{foo}` will expand the contents of `foo` into the parent object.<br>
+Nested expansion, `@{foo}` is similar, but won't discard `foo`'s actual container, and will nest it.
+
+For example, given `"list" : [10, 20, 30]`
+
+The following template:
+
+```
+    "obj": {
+        "somelist1" : [1, 2, 3, "@{list}"],
+        "somelist2" : [1, 2, 3, "@@{list}"]
+    }
+```
+
+results in:
+```
+    "obj": {
+        "somelist1" : [1, 2, 3, [10, 20, 30]],
+        "somelist2" : [1, 2, 3, 10, 20, 30]
+    }
+```
+
+
+
 
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>

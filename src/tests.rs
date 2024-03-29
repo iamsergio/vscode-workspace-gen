@@ -139,7 +139,6 @@ fn test_gen_description() {
 }
 
 #[test]
-#[ignore]
 fn test_inner_expand() {
     let template = r#"{
         "globals": {
