@@ -98,7 +98,6 @@ fn replace_nesteds(
 ) -> Result<(), Error> {
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
-
         match token_kind(value) {
             TokenKind::Nested(key) => {
                 if let Some(replacement_value) = globals.get(key.as_str()) {
@@ -121,20 +120,18 @@ fn replace_nesteds(
         let mut new_array_value = serde_json::Value::Array(vec![]);
         let new_array = new_array_value.as_array_mut().unwrap();
         for v in value.as_array().unwrap() {
-            if v.is_string() {
-                if let TokenKind::Inplace(key) = token_kind(v) {
-                    if let Some(replacement_value) = globals.get(key.as_str()) {
-                        if replacement_value.is_array() {
-                            for gv in replacement_value.as_array().unwrap() {
-                                new_array.push(gv.clone());
-                            }
-                        } else {
-                            new_array.push(replacement_value.clone());
+            if let TokenKind::Inplace(key) = token_kind(v) {
+                if let Some(replacement_value) = globals.get(key.as_str()) {
+                    if replacement_value.is_array() {
+                        for gv in replacement_value.as_array().unwrap() {
+                            new_array.push(gv.clone());
                         }
                     } else {
-                        println!("No replacement found for key: {}", key);
-                        new_array.push(v.clone());
+                        new_array.push(replacement_value.clone());
                     }
+                } else {
+                    println!("No replacement found for key: {}", key);
+                    new_array.push(v.clone());
                 }
             } else {
                 new_array.push(v.clone());
