@@ -9,6 +9,10 @@ mod workspace;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    // Add -o option to specify output file
+    #[arg(short, long)]
+    output_filename: Option<String>,
+
     template_filename: String,
 }
 
@@ -18,7 +22,10 @@ fn suggest_target_filename(template_filename: &str) -> String {
 
 fn main() {
     let args = Args::parse();
-    let target_filename = suggest_target_filename(&args.template_filename);
+    let target_filename = match &args.output_filename {
+        Some(filename) => filename.clone(),
+        _ => suggest_target_filename(&args.template_filename),
+    };
 
     match workspace::generate_from_file(args.template_filename, target_filename) {
         Ok(_) => println!("Workspace generated successfully"),
