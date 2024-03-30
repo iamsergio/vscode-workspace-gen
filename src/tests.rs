@@ -17,6 +17,16 @@ fn test_unknown_file() {
 }
 
 #[test]
+fn test_empty() {
+    let template = "{}";
+    let expected: Value = serde_json::from_str("{}").unwrap();
+
+    let result = generate_from_string(&String::from(template)).unwrap();
+
+    assert_eq!(result, expected);
+}
+
+#[test]
 fn test_string_replacements() {
     let template = r#"{
         "gen.globals": {
