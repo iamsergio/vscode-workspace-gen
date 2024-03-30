@@ -23,7 +23,7 @@ pub fn generate_from_file(template_filename: String, target_filename: String) ->
 
     // write json to target file
     let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
-    let formatter = PrettyFormatter::with_indent(b"    ");
+    let formatter = PrettyFormatter::with_indent(b"  ");
     let mut serializer = Serializer::with_formatter(target_file, formatter);
     new_json.serialize(&mut serializer).map_err(Error::Json)?;
 
