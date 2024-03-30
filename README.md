@@ -98,6 +98,18 @@ results in:
     }
 ```
 
+### gen.os
+
+You can make certain objects only available on specific operating systems.
+```
+ "obj": {
+    "gen.os" : [ "windows, "linux" ]
+ }
+ ```
+
+If run on macOS, the above object won't be included in the output.
+
+```
 
 
 
