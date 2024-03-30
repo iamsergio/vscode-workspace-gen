@@ -152,7 +152,10 @@ fn replace_nesteds(
                 if let Some(replacement_value) = globals.get(key.as_str()) {
                     if replacement_value.is_object() {
                         for (rk, rv) in replacement_value.as_object().unwrap() {
-                            new_object.insert(rk.clone(), rv.clone());
+                            // only insert if old object does not have the key
+                            if !value.as_object().unwrap().contains_key(rk) {
+                                new_object.insert(rk.clone(), rv.clone());
+                            }
                         }
                     } else {
                         println!("Can only expand objects into objects");

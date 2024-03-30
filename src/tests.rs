@@ -194,6 +194,33 @@ fn test_inline_object_expand() {
 }
 
 #[test]
+fn test_inline_object_expand_priorities() {
+    let template = r#"{
+        "globals": {
+            "foo": {
+                "one": 1
+            }
+        },
+        "obj": {
+            "one" : 2,
+            "@@{foo}" : ""
+        }
+    }"#;
+
+    let expected: Value = serde_json::from_str(
+        r#"{
+        "obj": {
+            "one" : 2
+        }
+    }"#,
+    )
+    .unwrap();
+
+    let result = generate_from_string(&String::from(template)).unwrap();
+    assert_eq!(result, expected);
+}
+
+#[test]
 fn test_token_kind() {
     assert_eq!(
         token_kind_from_str("@{key}"),
