@@ -140,9 +140,34 @@ fn replace_nesteds(
 
         *value = new_array_value;
     } else if value.is_object() {
+        let mut new_object_value = serde_json::Value::Object(serde_json::Map::new());
+        let new_object = new_object_value.as_object_mut().unwrap();
+
         for (_, v) in value.as_object_mut().unwrap() {
             replace_nesteds(v, globals)?;
         }
+
+        for (k, v) in value.as_object().unwrap() {
+            if let TokenKind::Inplace(key) = token_kind_from_str(k.as_str()) {
+                if let Some(replacement_value) = globals.get(key.as_str()) {
+                    if replacement_value.is_object() {
+                        for (rk, rv) in replacement_value.as_object().unwrap() {
+                            new_object.insert(rk.clone(), rv.clone());
+                        }
+                    } else {
+                        println!("Can only expand objects into objects");
+                        new_object.insert(k.clone(), v.clone());
+                    }
+                } else {
+                    println!("No replacement found for key: {}", key);
+                    new_object.insert(k.clone(), v.clone());
+                }
+            } else {
+                new_object.insert(k.clone(), v.clone());
+            }
+        }
+
+        *value = new_object_value;
     }
 
     Ok(())

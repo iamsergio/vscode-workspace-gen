@@ -168,7 +168,6 @@ fn test_inline_list_expand() {
 }
 
 #[test]
-#[ignore]
 fn test_inline_object_expand() {
     let template = r#"{
         "globals": {
@@ -177,7 +176,7 @@ fn test_inline_object_expand() {
             }
         },
         "obj": {
-            "@@{foo}" : "",
+            "@@{foo}" : ""
         }
     }"#;
 
