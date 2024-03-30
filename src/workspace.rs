@@ -16,7 +16,6 @@ pub enum Error {
 }
 
 pub fn generate_from_file(template_filename: String, target_filename: String) -> Result<(), Error> {
-    // call generate with the contents of the file
     let template_contents = std::fs::read_to_string(template_filename).map_err(Error::Io)?;
 
     let new_json = generate_from_string(&template_contents)?;
@@ -38,14 +37,17 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
         return Err(Error::ExpectedRootObject);
     }
 
-    // Remove "gen.description" keys
-    discard_descriptions(&mut json[GEN_GLOBALS_KEY]);
+    // Remove "gen.description" keys:
+    if json.as_object().unwrap().contains_key(GEN_GLOBALS_KEY) {
+        discard_descriptions(&mut json[GEN_GLOBALS_KEY]);
+    }
 
     if let Some(globals) = json[GEN_GLOBALS_KEY].as_object().cloned() {
         json.as_object_mut().unwrap().remove(GEN_GLOBALS_KEY);
         replace_nesteds(&mut json, &globals)?;
     }
 
+    // Honour "gen.os":
     remove_incompatible_os(&mut json);
 
     Ok(json)
