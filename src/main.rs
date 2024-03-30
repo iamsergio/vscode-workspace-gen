@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-use std::process;
-
 use clap::Parser;
+use std::process;
 
 mod workspace;
 
