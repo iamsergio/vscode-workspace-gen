@@ -237,7 +237,9 @@ fn test_gen_os() {
 
             "bar2" : {
                 "windows only global": 2,
-                "gen.os": ["windows"]
+                "gen.os": ["windows"],
+                "a" : 2,
+                "b" : 3
             }
         },
         "obj": {
@@ -261,13 +263,17 @@ fn test_gen_os() {
             "l1" : [
                 "@{bar}", "@{bar2}"
             ]
+        },
+        "obj6" : {
+            "@@{bar2}" : "",
+            "a" : 1
         }
-
     }"#;
 
     let expected: Value = serde_json::from_str(
         r#"{
         "obj": {},
+        "obj2": {},
         "obj3": {
             "l1": [
                 {},
@@ -283,6 +289,9 @@ fn test_gen_os() {
                     "linux only global": 1
                 }
             ]
+        },
+        "obj6" : {
+            "a" : 1
         }
     }"#,
     )
