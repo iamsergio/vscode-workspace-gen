@@ -221,6 +221,78 @@ fn test_inline_object_expand_priorities() {
 }
 
 #[test]
+#[cfg(target_os = "linux")]
+fn test_gen_os() {
+    let template = r#"{
+        "gen.globals": {
+            "foo": {
+                "one": 1,
+                "gen.os": ["windows"]
+            },
+
+           "bar" : {
+                "linux only global": 1,
+                "gen.os": ["linux"]
+            },
+
+            "bar2" : {
+                "windows only global": 2,
+                "gen.os": ["windows"]
+            }
+        },
+        "obj": {
+            "a" : "@{foo}"
+        },
+        "obj2": {
+            "@@{foo}" : ""
+        },
+        "obj3" : {
+            "gen.os": ["linux"],
+            "l1" : [
+                {}, {},
+                { "gen.os" : ["linux"], "b" : 1 },
+                { "gen.os" : ["windows"] }
+            ]
+        },
+        "obj4" : {
+            "gen.os": ["windows"]
+        },
+        "obj5" : {
+            "l1" : [
+                "@{bar}", "@{bar2}"
+            ]
+        }
+
+    }"#;
+
+    let expected: Value = serde_json::from_str(
+        r#"{
+        "obj": {},
+        "obj3": {
+            "l1": [
+                {},
+                {},
+                {
+                    "b": 1
+                }
+            ]
+        },
+        "obj5" : {
+            "l1" : [
+                {
+                    "linux only global": 1
+                }
+            ]
+        }
+    }"#,
+    )
+    .unwrap();
+
+    let result = generate_from_string(&String::from(template)).unwrap();
+    assert_eq!(result, expected);
+}
+
+#[test]
 fn test_token_kind() {
     assert_eq!(
         token_kind_from_str("@{key}"),
@@ -236,4 +308,32 @@ fn test_token_kind() {
     assert_eq!(token_kind_from_str("key}"), TokenKind::None);
     assert_eq!(token_kind_from_str("key"), TokenKind::None);
     assert_eq!(token_kind_from_str(""), TokenKind::None);
+}
+
+/// tests is_allowed_in_os
+#[test]
+fn test_is_allowed_in_os() {
+    if cfg!(linux) {
+        let value1 = serde_json::json!({
+            "gen.os": "windows"
+        });
+
+        let value2 = serde_json::json!({
+            "gen.os": "linux"
+        });
+
+        assert!(!is_allowed_in_os(&value1));
+        assert!(is_allowed_in_os(&value2));
+    } else if cfg!(windows) {
+        let value1 = serde_json::json!({
+            "gen.os": "windows"
+        });
+
+        let value2 = serde_json::json!({
+            "gen.os": "linux"
+        });
+
+        assert!(is_allowed_in_os(&value1));
+        assert!(!is_allowed_in_os(&value2));
+    }
 }
