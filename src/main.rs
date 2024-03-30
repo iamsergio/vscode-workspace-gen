@@ -5,6 +5,7 @@ use std::process;
 
 mod workspace;
 
+mod config;
 #[cfg(test)]
 mod tests;
 
@@ -29,7 +30,9 @@ fn main() {
         _ => suggest_target_filename(&args.template_filename),
     };
 
-    match workspace::generate_from_file(args.template_filename, target_filename) {
+    let config = config::Config::from_default_file().unwrap_or_default();
+
+    match workspace::generate_from_file(args.template_filename, target_filename, &config) {
         Ok(_) => println!("Workspace generated successfully"),
         Err(e) => {
             match e {

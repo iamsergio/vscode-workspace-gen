@@ -4,6 +4,8 @@ use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
 use std::env;
 
+use crate::config::Config;
+
 const GEN_GLOBALS_KEY: &str = "gen.globals";
 const GEN_DESCRIPTION_KEY: &str = "gen.description";
 const GEN_OS_KEY: &str = "gen.os";
@@ -15,14 +17,21 @@ pub enum Error {
     ExpectedRootObject,
 }
 
-pub fn generate_from_file(template_filename: String, target_filename: String) -> Result<(), Error> {
+pub fn generate_from_file(
+    template_filename: String,
+    target_filename: String,
+    config: &Config,
+) -> Result<(), Error> {
     let template_contents = std::fs::read_to_string(template_filename).map_err(Error::Io)?;
 
     let new_json = generate_from_string(&template_contents)?;
 
     // write json to target file
     let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
-    let formatter = PrettyFormatter::with_indent(b"  ");
+
+    let indent_str = b" ".repeat(config.json_indent() as usize);
+    let formatter = PrettyFormatter::with_indent(indent_str.as_slice());
+
     let mut serializer = Serializer::with_formatter(target_file, formatter);
     new_json.serialize(&mut serializer).map_err(Error::Json)?;
 

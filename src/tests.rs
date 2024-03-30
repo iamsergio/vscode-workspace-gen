@@ -1,11 +1,15 @@
 // SPDX-License-Identifier: MIT
 
-use crate::workspace::*;
+use crate::{config::Config, workspace::*};
 use serde_json::Value;
 
 #[test]
 fn test_unknown_file() {
-    let result = generate_from_file("unknown.template".to_string(), "unknown".to_string());
+    let result = generate_from_file(
+        "unknown.template".to_string(),
+        "unknown".to_string(),
+        &Config::default(),
+    );
     assert!(result.is_err());
     match result {
         Err(Error::Io(e)) => match e.kind() {
