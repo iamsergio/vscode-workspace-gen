@@ -177,6 +177,10 @@ fn replace_nesteds(
         for (k, v) in value.as_object().unwrap() {
             if let TokenKind::Inplace(key) = token_kind_from_str(k.as_str()) {
                 if let Some(replacement_value) = globals.get(key.as_str()) {
+                    if !is_allowed_in_os(replacement_value) {
+                        continue;
+                    }
+
                     if replacement_value.is_object() {
                         for (rk, rv) in replacement_value.as_object().unwrap() {
                             // only insert if old object does not have the key
