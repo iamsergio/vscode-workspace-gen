@@ -2,6 +2,12 @@
 
 
 
+## [0.2.2] - 2024-03-30
+
+### 🚀 Features
+
+- Test release-plz again
+
 ## [0.2.1] - 2024-03-30
 
 ### 🚀 Features
