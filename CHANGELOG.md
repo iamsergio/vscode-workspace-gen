@@ -2,6 +2,12 @@
 
 
 
+## [0.2.1] - 2024-03-30
+
+### ⚙️ Miscellaneous Tasks
+
+- Install git-cliff via action so it's cached
+
 ## [0.1.2] - 2024-03-30
 
 ### 🚜 Refactor
