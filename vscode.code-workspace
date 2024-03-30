@@ -1,80 +1,80 @@
 {
-    "launch": {
-        "version": "0.2.0",
-        "configurations": [
-            {
-                "type": "lldb",
-                "request": "launch",
-                "name": "vscode-workspace-gen",
-                "cargo": {
-                    "args": [
-                        "build",
-                        "--bin=vscode-workspace-gen",
-                        "--package=vscode-workspace-gen"
-                    ],
-                    "filter": {
-                        "name": "vscode-workspace-gen",
-                        "kind": "bin"
-                    }
-                },
-                "args": [],
-                "cwd": "${workspaceFolder}"
-            },
-            {
-                "type": "lldb",
-                "request": "launch",
-                "name": "tests",
-                "cargo": {
-                    "args": [
-                        "test",
-                        "--no-run",
-                        "--bin=vscode-workspace-gen",
-                        "--package=vscode-workspace-gen"
-                    ],
-                    "filter": {
-                        "name": "vscode-workspace-gen",
-                        "kind": "bin"
-                    }
-                },
-                "args": [],
-                "cwd": "${workspaceFolder}"
-            },
-            {
-                "type": "lldb",
-                "request": "launch",
-                "name": "tests ASAN",
-                "cargo": {
-                    "args": [
-                        "+nightly",
-                        "test",
-                        "--no-run",
-                        "--bin=vscode-workspace-gen",
-                        "--package=vscode-workspace-gen",
-                        "-Zbuild-std",
-                        "--target=x86_64-unknown-linux-gnu"
-                    ],
-                    "filter": {
-                        "name": "vscode-workspace-gen",
-                        "kind": "bin"
-                    }
-                },
-                "args": [],
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "RUSTFLAGS": "-Zsanitizer=address"
-                }
-            }
-        ]
-    },
-    "folders": [
-        {
-            "path": "."
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "lldb",
+        "request": "launch",
+        "name": "vscode-workspace-gen",
+        "cargo": {
+          "args": [
+            "build",
+            "--bin=vscode-workspace-gen",
+            "--package=vscode-workspace-gen"
+          ],
+          "filter": {
+            "name": "vscode-workspace-gen",
+            "kind": "bin"
+          }
+        },
+        "args": [],
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "type": "lldb",
+        "request": "launch",
+        "name": "tests",
+        "cargo": {
+          "args": [
+            "test",
+            "--no-run",
+            "--bin=vscode-workspace-gen",
+            "--package=vscode-workspace-gen"
+          ],
+          "filter": {
+            "name": "vscode-workspace-gen",
+            "kind": "bin"
+          }
+        },
+        "args": [],
+        "cwd": "${workspaceFolder}"
+      },
+      {
+        "type": "lldb",
+        "request": "launch",
+        "name": "tests ASAN",
+        "cargo": {
+          "args": [
+            "+nightly",
+            "test",
+            "--no-run",
+            "--bin=vscode-workspace-gen",
+            "--package=vscode-workspace-gen",
+            "-Zbuild-std",
+            "--target=x86_64-unknown-linux-gnu"
+          ],
+          "filter": {
+            "name": "vscode-workspace-gen",
+            "kind": "bin"
+          }
+        },
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "RUSTFLAGS": "-Zsanitizer=address"
         }
-    ],
-    "settings": {
-        "editor.formatOnSave": true,
-        "files.associations": {
-            "*.template": "json"
-        }
+      }
+    ]
+  },
+  "folders": [
+    {
+      "path": "."
     }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "files.associations": {
+      "*.template": "json"
+    }
+  }
 }
