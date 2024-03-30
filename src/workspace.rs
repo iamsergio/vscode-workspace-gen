@@ -2,9 +2,11 @@
 
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
+use std::env;
 
 const GEN_GLOBALS_KEY: &str = "gen.globals";
 const GEN_DESCRIPTION_KEY: &str = "gen.description";
+const GEN_OS_KEY: &str = "gen.os";
 
 #[derive(Debug)]
 pub enum Error {
@@ -43,6 +45,8 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
         json.as_object_mut().unwrap().remove(GEN_GLOBALS_KEY);
         replace_nesteds(&mut json, &globals)?;
     }
+
+    remove_incompatible_os(&mut json);
 
     Ok(json)
 }
@@ -90,6 +94,26 @@ pub fn token_kind(value: &serde_json::Value) -> TokenKind {
     }
 
     TokenKind::None
+}
+
+pub fn current_os() -> &'static str {
+    env::consts::OS
+}
+
+/// If an object contains a "gen.os" key, it will only be included if the current OS is in the list
+pub fn is_allowed_in_os(value: &serde_json::Value) -> bool {
+    if let Some(obj) = value.as_object() {
+        if let Some(os) = obj.get(GEN_OS_KEY) {
+            return (os.is_array()
+                && os
+                    .as_array()
+                    .unwrap()
+                    .contains(&serde_json::Value::String(current_os().to_string())))
+                || (os.is_string() && os.as_str().unwrap() == current_os());
+        }
+    }
+
+    true
 }
 
 /// Replaces "${key}" instances
@@ -141,13 +165,15 @@ fn replace_nesteds(
 
         *value = new_array_value;
     } else if value.is_object() {
-        let mut new_object_value = serde_json::Value::Object(serde_json::Map::new());
-        let new_object = new_object_value.as_object_mut().unwrap();
-
+        // Replace @{key}
         for (_, v) in value.as_object_mut().unwrap() {
             replace_nesteds(v, globals)?;
         }
 
+        let mut new_object_value = serde_json::Value::Object(serde_json::Map::new());
+        let new_object = new_object_value.as_object_mut().unwrap();
+
+        // Replace @@{key}
         for (k, v) in value.as_object().unwrap() {
             if let TokenKind::Inplace(key) = token_kind_from_str(k.as_str()) {
                 if let Some(replacement_value) = globals.get(key.as_str()) {
@@ -175,4 +201,27 @@ fn replace_nesteds(
     }
 
     Ok(())
+}
+
+/// If an object has "gen.os", we remove it if the OS is not compatible
+fn remove_incompatible_os(value: &mut serde_json::Value) {
+    if value.is_object() {
+        let value_obj = value.as_object_mut().unwrap();
+
+        value_obj.retain(|_, v| is_allowed_in_os(v));
+
+        value_obj.remove(GEN_OS_KEY);
+
+        // obj.remove(GEN_OS_KEY);
+        for (_, v) in value_obj {
+            remove_incompatible_os(v);
+        }
+    } else if value.is_array() {
+        let value_array = value.as_array_mut().unwrap();
+        value_array.retain(is_allowed_in_os);
+
+        for v in value_array {
+            remove_incompatible_os(v);
+        }
+    }
 }
