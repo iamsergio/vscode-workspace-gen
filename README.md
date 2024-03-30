@@ -109,6 +109,17 @@ You can make certain objects only available on specific operating systems.
 
 If run on `macos`, the above object won't be included in the output.
 
+### config
+
+You can create a `.vscode-workspace-gen.json` file and change some settings.
+Currently supported settings:
+
+```
+{
+    "json_indent": 2
+}
+```
+
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/lints.yml/badge.svg)
