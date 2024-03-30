@@ -19,7 +19,7 @@ fn test_unknown_file() {
 #[test]
 fn test_string_replacements() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "name": "John Doe",
             "age": 42
         },
@@ -47,7 +47,7 @@ fn test_string_replacements() {
 #[test]
 fn test_list_replacements() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "numbers": [1, 2, 3, 4, 5, 6, 7],
             "empty": []
         },
@@ -75,7 +75,7 @@ fn test_list_replacements() {
 #[test]
 fn test_obj_replacements() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "numbers": {
                 "one": 1,
                 "two": 2,
@@ -111,7 +111,7 @@ fn test_obj_replacements() {
 #[test]
 fn test_gen_description() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "foo": {
                 "one": 1,
                 "gen.description": "This is a description"
@@ -141,7 +141,7 @@ fn test_gen_description() {
 #[test]
 fn test_inline_list_expand() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "foo": {
                 "one": 1
             },
@@ -170,7 +170,7 @@ fn test_inline_list_expand() {
 #[test]
 fn test_inline_object_expand() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "foo": {
                 "one": 1
             }
@@ -196,7 +196,7 @@ fn test_inline_object_expand() {
 #[test]
 fn test_inline_object_expand_priorities() {
     let template = r#"{
-        "globals": {
+        "gen.globals": {
             "foo": {
                 "one": 1
             }

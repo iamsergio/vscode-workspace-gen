@@ -1,5 +1,5 @@
 {
-	"globals": {
+	"gen.globals": {
 		"filter": {
 			"name": "vscode-workspace-gen",
 			"kind": "bin"

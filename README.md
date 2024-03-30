@@ -20,7 +20,7 @@ Add every object you want to reuse to the `globals` section.
 
 ```
 {
-    "globals": {
+    "gen.globals": {
         "numbers": {
             "one": 1,
             "two": 2,

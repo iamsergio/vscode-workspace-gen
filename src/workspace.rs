@@ -3,6 +3,7 @@
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
 
+const GEN_GLOBALS_KEY: &str = "gen.globals";
 const GEN_DESCRIPTION_KEY: &str = "gen.description";
 
 #[derive(Debug)]
@@ -36,10 +37,10 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
     }
 
     // Remove "gen.description" keys
-    discard_descriptions(&mut json["globals"]);
+    discard_descriptions(&mut json[GEN_GLOBALS_KEY]);
 
-    if let Some(globals) = json["globals"].as_object().cloned() {
-        json.as_object_mut().unwrap().remove("globals");
+    if let Some(globals) = json[GEN_GLOBALS_KEY].as_object().cloned() {
+        json.as_object_mut().unwrap().remove(GEN_GLOBALS_KEY);
         replace_nesteds(&mut json, &globals)?;
     }
 
