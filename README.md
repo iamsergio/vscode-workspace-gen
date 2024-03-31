@@ -116,9 +116,20 @@ Currently supported settings:
 
 ```
 {
-    "json_indent": 2
+    "json_indent": 2,
+    "output_filename": "vscode.code-workspace",
+    "per_os_output_filenames": {
+        "linux": "linux.code-workspace",
+        "windows": "windows.code-workspace",
+        "macos": "macos.code-workspace"
+    }
 }
 ```
+- `json_indent` Specifies the amount of indentation for the JSON output
+- `output_filename` Equivalent to passing `-c <output_filename>`. The commandline has priority though.
+- `per_os_output_filenames` Allows to generate output for each operating system. Each file is potentially different, due to usage of `gen.os`
+This option is incompatible with `output_filename`.
+
 
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>

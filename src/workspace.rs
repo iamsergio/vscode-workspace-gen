@@ -2,7 +2,6 @@
 
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
-use std::env;
 
 use crate::config::Config;
 
@@ -21,10 +20,11 @@ pub fn generate_from_file(
     template_filename: String,
     target_filename: String,
     config: &Config,
+    current_os: &str,
 ) -> Result<(), Error> {
     let template_contents = std::fs::read_to_string(template_filename).map_err(Error::Io)?;
 
-    let new_json = generate_from_string(&template_contents)?;
+    let new_json = generate_from_string(&template_contents, current_os)?;
 
     // write json to target file
     let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
@@ -38,7 +38,10 @@ pub fn generate_from_file(
     Ok(())
 }
 
-pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value, Error> {
+pub fn generate_from_string(
+    template_contents: &str,
+    current_os: &str,
+) -> Result<serde_json::Value, Error> {
     let mut json: serde_json::Value =
         serde_json::from_str(template_contents).map_err(Error::Json)?;
 
@@ -53,11 +56,11 @@ pub fn generate_from_string(template_contents: &str) -> Result<serde_json::Value
 
     if let Some(globals) = json[GEN_GLOBALS_KEY].as_object().cloned() {
         json.as_object_mut().unwrap().remove(GEN_GLOBALS_KEY);
-        replace_nesteds(&mut json, &globals)?;
+        replace_nesteds(&mut json, &globals, current_os)?;
     }
 
     // Honour "gen.os":
-    remove_incompatible_os(&mut json);
+    remove_incompatible_os(&mut json, current_os);
 
     Ok(json)
 }
@@ -107,20 +110,16 @@ pub fn token_kind(value: &serde_json::Value) -> TokenKind {
     TokenKind::None
 }
 
-pub fn current_os() -> &'static str {
-    env::consts::OS
-}
-
 /// If an object contains a "gen.os" key, it will only be included if the current OS is in the list
-pub fn is_allowed_in_os(value: &serde_json::Value) -> bool {
+pub fn is_allowed_in_os(value: &serde_json::Value, current_os: &str) -> bool {
     if let Some(obj) = value.as_object() {
         if let Some(os) = obj.get(GEN_OS_KEY) {
             return (os.is_array()
                 && os
                     .as_array()
                     .unwrap()
-                    .contains(&serde_json::Value::String(current_os().to_string())))
-                || (os.is_string() && os.as_str().unwrap() == current_os());
+                    .contains(&serde_json::Value::String(current_os.to_string())))
+                || (os.is_string() && os.as_str().unwrap() == current_os);
         }
     }
 
@@ -131,6 +130,7 @@ pub fn is_allowed_in_os(value: &serde_json::Value) -> bool {
 fn replace_nesteds(
     value: &mut serde_json::Value,
     globals: &serde_json::Map<String, serde_json::Value>,
+    current_os: &str,
 ) -> Result<(), Error> {
     if value.is_string() {
         // checks that the value conforms to the format @{contents}
@@ -149,7 +149,7 @@ fn replace_nesteds(
         return Ok(());
     } else if value.is_array() {
         for v in value.as_array_mut().unwrap() {
-            replace_nesteds(v, globals)?;
+            replace_nesteds(v, globals, current_os)?;
         }
 
         // expand $${key} instances
@@ -178,7 +178,7 @@ fn replace_nesteds(
     } else if value.is_object() {
         // Replace @{key}
         for (_, v) in value.as_object_mut().unwrap() {
-            replace_nesteds(v, globals)?;
+            replace_nesteds(v, globals, current_os)?;
         }
 
         let mut new_object_value = serde_json::Value::Object(serde_json::Map::new());
@@ -188,7 +188,7 @@ fn replace_nesteds(
         for (k, v) in value.as_object().unwrap() {
             if let TokenKind::Inplace(key) = token_kind_from_str(k.as_str()) {
                 if let Some(replacement_value) = globals.get(key.as_str()) {
-                    if !is_allowed_in_os(replacement_value) {
+                    if !is_allowed_in_os(replacement_value, current_os) {
                         continue;
                     }
 
@@ -219,24 +219,24 @@ fn replace_nesteds(
 }
 
 /// If an object has "gen.os", we remove it if the OS is not compatible
-fn remove_incompatible_os(value: &mut serde_json::Value) {
+fn remove_incompatible_os(value: &mut serde_json::Value, current_os: &str) {
     if value.is_object() {
         let value_obj = value.as_object_mut().unwrap();
 
-        value_obj.retain(|_, v| is_allowed_in_os(v));
+        value_obj.retain(|_, v| is_allowed_in_os(v, current_os));
 
         value_obj.remove(GEN_OS_KEY);
 
         // obj.remove(GEN_OS_KEY);
         for (_, v) in value_obj {
-            remove_incompatible_os(v);
+            remove_incompatible_os(v, current_os);
         }
     } else if value.is_array() {
         let value_array = value.as_array_mut().unwrap();
-        value_array.retain(is_allowed_in_os);
+        value_array.retain(|v| is_allowed_in_os(v, current_os));
 
         for v in value_array {
-            remove_incompatible_os(v);
+            remove_incompatible_os(v, current_os);
         }
     }
 }

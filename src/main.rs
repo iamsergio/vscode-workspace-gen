@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 
 use clap::Parser;
-use std::process;
+use std::{env, process};
 
 mod workspace;
 
@@ -25,14 +25,53 @@ fn suggest_target_filename(template_filename: &str) -> String {
 
 fn main() {
     let args = Args::parse();
-    let target_filename = match &args.output_filename {
-        Some(filename) => filename.clone(),
-        _ => suggest_target_filename(&args.template_filename),
+    let config =
+        config::Config::from_default_file().expect("Config file exists but can't be parsed");
+
+    if let Err(e) = config.is_valid() {
+        println!("Config: {}", e);
+        process::exit(-1);
+    }
+
+    let result: Result<(), workspace::Error> = if let Some(target_filename) = &args.output_filename
+    {
+        // Case 1. User passed -o <target_filename>
+        workspace::generate_from_file(
+            args.template_filename,
+            target_filename.to_string(),
+            &config,
+            env::consts::OS,
+        )
+    } else if config.has_target() {
+        // Case 2. There's a .vscode-workspace-gen.json config file with either 'output_filename' or 'per_os_output_filename's set
+        let targets = config.targets().expect("Config has no usable targets");
+        let mut last_result: Result<(), workspace::Error> = Ok(());
+        for (os, target_filename) in targets {
+            last_result = workspace::generate_from_file(
+                args.template_filename.clone(),
+                target_filename.clone(),
+                &config,
+                os,
+            );
+
+            if last_result.is_err() {
+                break;
+            }
+        }
+
+        last_result
+    } else {
+        // 3. Let's simply remove ".template" from the template filename
+        let target_filename = suggest_target_filename(&args.template_filename);
+        workspace::generate_from_file(
+            args.template_filename,
+            target_filename,
+            &config,
+            env::consts::OS,
+        )
     };
 
-    let config = config::Config::from_default_file().unwrap_or_default();
-
-    match workspace::generate_from_file(args.template_filename, target_filename, &config) {
+    match result {
         Ok(_) => println!("Workspace generated successfully"),
         Err(e) => {
             match e {

@@ -17,7 +17,9 @@
             "kind": "bin"
           }
         },
-        "args": [],
+        "args": [
+          "vscode.code-workspace.template"
+        ],
         "cwd": "${workspaceFolder}"
       },
       {

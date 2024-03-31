@@ -1,3 +1,4 @@
 {
-    "json_indent": 2
+    "json_indent": 2,
+    "output_filename": "vscode.code-workspace"
 }

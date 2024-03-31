@@ -9,6 +9,7 @@ fn test_unknown_file() {
         "unknown.template".to_string(),
         "unknown".to_string(),
         &Config::default(),
+        std::env::consts::OS,
     );
     assert!(result.is_err());
     match result {
@@ -25,7 +26,7 @@ fn test_empty() {
     let template = "{}";
     let expected: Value = serde_json::from_str("{}").unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
 
     assert_eq!(result, expected);
 }
@@ -53,7 +54,7 @@ fn test_string_replacements() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
 
     assert_eq!(result, expected);
 }
@@ -81,7 +82,7 @@ fn test_list_replacements() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
 
     assert_eq!(result, expected);
 }
@@ -117,7 +118,7 @@ fn test_obj_replacements() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
 
     assert_eq!(result, expected);
 }
@@ -148,7 +149,7 @@ fn test_gen_description() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
     assert_eq!(result, expected);
 }
 
@@ -177,7 +178,7 @@ fn test_inline_list_expand() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
     assert_eq!(result, expected);
 }
 
@@ -203,7 +204,7 @@ fn test_inline_object_expand() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
     assert_eq!(result, expected);
 }
 
@@ -230,7 +231,7 @@ fn test_inline_object_expand_priorities() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
     assert_eq!(result, expected);
 }
 
@@ -311,7 +312,7 @@ fn test_gen_os() {
     )
     .unwrap();
 
-    let result = generate_from_string(&String::from(template)).unwrap();
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
     assert_eq!(result, expected);
 }
 
@@ -345,8 +346,8 @@ fn test_is_allowed_in_os() {
             "gen.os": "linux"
         });
 
-        assert!(!is_allowed_in_os(&value1));
-        assert!(is_allowed_in_os(&value2));
+        assert!(!is_allowed_in_os(&value1, std::env::consts::OS));
+        assert!(is_allowed_in_os(&value2, std::env::consts::OS));
     } else if cfg!(windows) {
         let value1 = serde_json::json!({
             "gen.os": "windows"
@@ -356,7 +357,7 @@ fn test_is_allowed_in_os() {
             "gen.os": "linux"
         });
 
-        assert!(is_allowed_in_os(&value1));
-        assert!(!is_allowed_in_os(&value2));
+        assert!(is_allowed_in_os(&value1, std::env::consts::OS));
+        assert!(!is_allowed_in_os(&value2, std::env::consts::OS));
     }
 }

@@ -31,7 +31,9 @@
 					],
 					"filter": "@{filter}"
 				},
-				"args": [],
+				"args": [
+					"vscode.code-workspace.template"
+				],
 				"cwd": "${workspaceFolder}"
 			},
 			{
