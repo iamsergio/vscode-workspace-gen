@@ -27,7 +27,8 @@
 					"args": [
 						"build",
 						"--bin=vscode-workspace-gen",
-						"--package=vscode-workspace-gen"
+						"--package=vscode-workspace-gen",
+						"--features=qt"
 					],
 					"filter": "@{filter}"
 				},
@@ -73,6 +74,20 @@
 				"env": {
 					"RUSTFLAGS": "-Zsanitizer=address"
 				}
+			}
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Run workspace gen",
+				"type": "shell",
+				"command": "vscode-workspace-gen",
+				"args": [
+					"vscode.code-workspace.template"
+				],
+				"problemMatcher": []
 			}
 		]
 	}

@@ -1,4 +1,29 @@
 {
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run workspace gen",
+        "type": "shell",
+        "command": "vscode-workspace-gen",
+        "args": [
+          "vscode.code-workspace.template"
+        ],
+        "problemMatcher": []
+      }
+    ]
+  },
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "files.associations": {
+      "*.code-workspace.template": "json"
+    }
+  },
   "launch": {
     "version": "0.2.0",
     "configurations": [
@@ -10,7 +35,8 @@
           "args": [
             "build",
             "--bin=vscode-workspace-gen",
-            "--package=vscode-workspace-gen"
+            "--package=vscode-workspace-gen",
+            "--features=qt"
           ],
           "filter": {
             "name": "vscode-workspace-gen",
@@ -67,16 +93,5 @@
         }
       }
     ]
-  },
-  "folders": [
-    {
-      "path": "."
-    }
-  ],
-  "settings": {
-    "editor.formatOnSave": true,
-    "files.associations": {
-      "*.template": "json"
-    }
   }
 }
