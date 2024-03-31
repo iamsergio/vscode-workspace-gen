@@ -2,6 +2,17 @@
 
 
 
+## [1.2.0] - 2024-03-31
+
+### 🚀 Features
+
+- Added --download_qtnatvis option
+
+### ⚙️ Miscellaneous Tasks
+
+- *(vscode)* Qualify the json extension a bit more
+- *(vscode)* Update workspace file
+
 ## [1.1.0] - 2024-03-31
 
 ### 🚀 Features
