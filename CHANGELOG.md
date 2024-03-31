@@ -2,6 +2,24 @@
 
 
 
+## [1.1.0] - 2024-03-31
+
+### 🚀 Features
+
+- Support a .vscode-workspace-gen.json file
+- Allow to generate per OS
+
+### 📚 Documentation
+
+- Fix README typo
+- Make it clear that macos is an available gen.os value
+- Updated README regarding json_indent
+
+### ⚙️ Miscellaneous Tasks
+
+- *(vscode)* Regenerate workspace
+- Update Cargo.lock
+
 ## [0.2.2] - 2024-03-30
 
 ### 🚀 Features
