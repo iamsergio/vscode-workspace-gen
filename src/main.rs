@@ -9,6 +9,9 @@ mod config;
 #[cfg(test)]
 mod tests;
 
+#[cfg(feature = "qt")]
+mod qt;
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -17,14 +20,53 @@ struct Args {
     output_filename: Option<String>,
 
     template_filename: String,
+
+    // HACK: Just so it appears in the help. Actual processing is done by ArgsQt.
+    // Need to find out how to support 2 sets of argument options
+    #[cfg(feature = "qt")]
+    #[arg(long)]
+    download_qtnatvis: bool,
+}
+
+#[cfg(feature = "qt")]
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct ArgsQt {
+    #[arg(long)]
+    download_qtnatvis: bool,
 }
 
 fn suggest_target_filename(template_filename: &str) -> String {
     template_filename.to_string().replace(".template", "")
 }
 
+#[cfg(feature = "qt")]
+fn handle_qt_usecase() {
+    if let Ok(args) = ArgsQt::try_parse() {
+        if args.download_qtnatvis {
+            process::exit(match qt::download_qtnatvis() {
+                Ok(_) => {
+                    println!("Downloaded qt6.natvis");
+                    0
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    1
+                }
+            });
+        }
+    }
+}
+
 fn main() {
+    // Handle --download-qtnatvis
+    #[cfg(feature = "qt")]
+    handle_qt_usecase();
+
+    // Handle the main use case:
+
     let args = Args::parse();
+
     let config =
         config::Config::from_default_file().expect("Config file exists but can't be parsed");
 

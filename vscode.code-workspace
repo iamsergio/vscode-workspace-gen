@@ -22,7 +22,11 @@
     "editor.formatOnSave": true,
     "files.associations": {
       "*.code-workspace.template": "json"
-    }
+    },
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "rust-analyzer.cargo.features": [
+      "qt"
+    ]
   },
   "launch": {
     "version": "0.2.0",

@@ -11,6 +11,10 @@ specify json objects you want to reuse and then reference them instead of duplic
 
 `cargo install vscode-workspace-gen`
 
+or, if you're a Qt user:
+
+`cargo install vscode-workspace-gen --features qt`
+
 ## Usage:
 
 A real scenario could be factoring-out duplicated vscode launches, pretty printers and source map settings.<br>
@@ -130,6 +134,12 @@ Currently supported settings:
 - `per_os_output_filenames` Allows to generate output for each operating system. Each file is potentially different, due to usage of `gen.os`
 This option is incompatible with `output_filename`.
 
+
+## Convenience for Qt
+
+If you passed `--features qt` to `cargo install`, you have some convenience options regarding Qt.
+For now, it adds:
+- `--download_qtnatvis` Downloads the `qt6.natvis`, which contains pretty printers for debugging Qt.
 
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>
