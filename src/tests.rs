@@ -361,3 +361,29 @@ fn test_is_allowed_in_os() {
         assert!(!is_allowed_in_os(&value2, std::env::consts::OS));
     }
 }
+
+#[test]
+fn test_replace_env_vars() {
+    // Sets FOO env var to "bar"
+    std::env::set_var("FOO", "bar");
+
+    let template = r#"{
+        "obj": {
+            "a": "$${FOO}",
+            "b": "$${DONTEXIST_FOO}"
+        }
+    }"#;
+
+    let expected: Value = serde_json::from_str(
+        r#"{
+        "obj": {
+            "a": "bar",
+            "b": "$${DONTEXIST_FOO}"
+        }
+    }"#,
+    )
+    .unwrap();
+
+    let result = generate_from_string(&String::from(template), std::env::consts::OS).unwrap();
+    assert_eq!(result, expected);
+}

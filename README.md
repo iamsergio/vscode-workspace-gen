@@ -134,6 +134,12 @@ Currently supported settings:
 - `per_os_output_filenames` Allows to generate output for each operating system. Each file is potentially different, due to usage of `gen.os`
 This option is incompatible with `output_filename`.
 
+## Env var replacing
+
+Since vscode won't replace `${env_var}` everywhere, we support replacing env vars as well, but in a more consistent manner.\n
+Any occurrence of `$${env_var}` will be replaced with the env var's contents. This workarounds msvc launcher supporting expanding
+`${env}` while the LLDB ones not.
+
 
 ## Convenience for Qt
 

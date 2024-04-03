@@ -62,6 +62,9 @@ pub fn generate_from_string(
     // Honour "gen.os":
     remove_incompatible_os(&mut json, current_os);
 
+    // replace $${env_var} instances
+    replace_env_vars(&mut json);
+
     Ok(json)
 }
 
@@ -237,6 +240,34 @@ fn remove_incompatible_os(value: &mut serde_json::Value, current_os: &str) {
 
         for v in value_array {
             remove_incompatible_os(v, current_os);
+        }
+    }
+}
+
+fn replace_env_vars(value: &mut serde_json::Value) {
+    if value.is_string() {
+        let mut new_value = value.as_str().unwrap().to_string();
+
+        // regexp for $${key} and replace key with env var, if it exists
+        let re = regex::Regex::new(r"\$\$\{([A-Za-z0-9_]+)\}").unwrap();
+        new_value = re
+            .replace_all(
+                new_value.as_str(),
+                |caps: &regex::Captures| match std::env::var(caps.get(1).unwrap().as_str()) {
+                    Ok(val) => val,
+                    Err(_) => caps.get(0).unwrap().as_str().to_string(),
+                },
+            )
+            .to_string();
+
+        *value = serde_json::Value::String(new_value);
+    } else if value.is_object() {
+        for (_, v) in value.as_object_mut().unwrap() {
+            replace_env_vars(v);
+        }
+    } else if value.is_array() {
+        for v in value.as_array_mut().unwrap() {
+            replace_env_vars(v);
         }
     }
 }
