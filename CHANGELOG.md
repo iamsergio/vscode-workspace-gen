@@ -2,6 +2,21 @@
 
 
 
+## [1.3.0] - 2024-04-03
+
+### 🚀 Features
+
+- Replace env vars in the form of $${env_var}
+
+### ⚙️ Miscellaneous Tasks
+
+- Add qt6.natvis to .gitignore
+- Add codespell pre-commit hook
+- *(ci)* Add a pre-commit GH action
+- Add a .codespellrc
+- Allow ser:: in codespell
+- Allow ser in codespell
+
 ## [1.2.0] - 2024-03-31
 
 ### 🚀 Features
