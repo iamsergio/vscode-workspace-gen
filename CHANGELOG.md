@@ -2,6 +2,20 @@
 
 
 
+## [1.4.0] - 2024-04-04
+
+### 🚀 Features
+
+- Add --create-cmake-presets
+
+### 🧪 Testing
+
+- Remove old natvis before running test_download_qtnatvis
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Pass --features qt to clippy
+
 ## [1.3.0] - 2024-04-03
 
 ### 🚀 Features
