@@ -2,7 +2,6 @@
 
 use clap::Parser;
 use std::{env, process};
-
 mod workspace;
 
 mod config;
@@ -11,6 +10,9 @@ mod tests;
 
 #[cfg(feature = "qt")]
 mod qt;
+
+#[cfg(feature = "qt")]
+mod cmake;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -26,6 +28,10 @@ struct Args {
     #[cfg(feature = "qt")]
     #[arg(long)]
     download_qtnatvis: bool,
+
+    #[cfg(feature = "qt")]
+    #[arg(long)]
+    create_cmake_presets: bool,
 }
 
 #[cfg(feature = "qt")]
@@ -34,6 +40,9 @@ struct Args {
 struct ArgsQt {
     #[arg(long)]
     download_qtnatvis: bool,
+
+    #[arg(long)]
+    create_cmake_presets: bool,
 }
 
 fn suggest_target_filename(template_filename: &str) -> String {
@@ -47,6 +56,17 @@ fn handle_qt_usecase() {
             process::exit(match qt::download_qtnatvis() {
                 Ok(_) => {
                     println!("Downloaded qt6.natvis");
+                    0
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    1
+                }
+            });
+        } else if args.create_cmake_presets {
+            process::exit(match cmake::generate_cmake_presets() {
+                Ok(_) => {
+                    println!("Created CMakePresets.json");
                     0
                 }
                 Err(e) => {
