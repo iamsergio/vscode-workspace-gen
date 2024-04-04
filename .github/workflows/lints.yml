@@ -26,4 +26,4 @@ jobs:
 
       - name: clippy
         run: |
-          cargo clippy -- -Dwarnings
+          cargo clippy --features qt -- -Dwarnings
