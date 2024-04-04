@@ -30,8 +30,14 @@ mod tests {
 
     #[test]
     fn test_download_qtnatvis() {
+        let _ = std::fs::remove_file(NATVIS_FILENAME);
+
         let result = download_qtnatvis();
-        assert!(result.is_ok());
+        if let Err(e) = &result {
+            eprintln!("{}", e);
+            panic!("Failed to download qt6.natvis");
+        }
+
         std::fs::remove_file(NATVIS_FILENAME).unwrap();
     }
 }
