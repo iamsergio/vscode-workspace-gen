@@ -14,6 +14,9 @@ mod qt;
 #[cfg(feature = "qt")]
 mod cmake;
 
+#[cfg(feature = "qt")]
+const DEFAULT_WORKSPACE_FILE: &str = "vscode.code-workspace.template";
+
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
@@ -32,6 +35,10 @@ struct Args {
     #[cfg(feature = "qt")]
     #[arg(long)]
     create_cmake_presets: bool,
+
+    #[cfg(feature = "qt")]
+    #[arg(long)]
+    create_default_vscode_workspace: bool,
 }
 
 #[cfg(feature = "qt")]
@@ -43,6 +50,9 @@ struct ArgsQt {
 
     #[arg(long)]
     create_cmake_presets: bool,
+
+    #[arg(long)]
+    create_default_vscode_workspace: bool,
 }
 
 fn suggest_target_filename(template_filename: &str) -> String {
@@ -74,6 +84,19 @@ fn handle_qt_usecase() {
                     1
                 }
             });
+        } else if args.create_default_vscode_workspace {
+            process::exit(
+                match qt::generate_vscode_workspace(DEFAULT_WORKSPACE_FILE) {
+                    Ok(_) => {
+                        println!("Created vscode.code-workspace.template");
+                        0
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        1
+                    }
+                },
+            );
         }
     }
 }
