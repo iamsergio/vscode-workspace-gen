@@ -3,7 +3,10 @@
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
 
-use crate::{config::Config, qt};
+use crate::config::Config;
+
+#[cfg(feature = "qt")]
+use crate::qt;
 
 const GEN_GLOBALS_KEY: &str = "gen.globals";
 const GEN_DESCRIPTION_KEY: &str = "gen.description";
