@@ -86,7 +86,7 @@ fn handle_qt_usecase() {
             });
         } else if args.create_default_vscode_workspace {
             process::exit(
-                match qt::generate_vscode_workspace(DEFAULT_WORKSPACE_FILE) {
+                match qt::generate_default_vscode_workspace(DEFAULT_WORKSPACE_FILE) {
                     Ok(_) => {
                         println!("Created vscode.code-workspace.template");
                         0
