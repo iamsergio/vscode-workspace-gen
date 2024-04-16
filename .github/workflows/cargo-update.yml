@@ -15,6 +15,9 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
+      - name: Setup git author name
+        uses: fregante/setup-git-user@v2
+
       - name: cargo update
         run: |
           cargo update
