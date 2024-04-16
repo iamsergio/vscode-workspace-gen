@@ -38,6 +38,12 @@ pub fn generate_vscode_workspace(dst_filename: &str) -> Result<(), String> {
     file.write_all(template_contents)
         .map_err(|e| e.to_string())?;
 
+    println!("Don't forget to set env variable QT_SDK_INSTALL to the root of the Qt SDK, for example /home/user/Qt/
+This folder should contain QtCreator, as it's required for LLDB pretty printers.");
+
+    println!("\nDon't forget to set env variable QT_INSTALL to the specific Qt installed version, for example/opt/Qt/6.2.0/gcc_64
+This is required for debugger source mapping\n");
+
     Ok(())
 }
 
