@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: MIT
+
+name: Trigger: cargo update
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: cargo update
+        run: |
+          cargo update
+
+      - name: Create PR
+        run: |
+          sh cargo_update.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
