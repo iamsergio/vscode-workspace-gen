@@ -2,6 +2,9 @@
 
 # Runs cargo update and creates a PR
 
+# If called by a workflow, you'll need to manually close/open the PR
+# to trigger all other workflows.
+
 cargo update
 
 if [ -n "$(git status --porcelain)" ]; then

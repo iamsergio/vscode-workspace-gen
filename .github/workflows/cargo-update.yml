@@ -1,5 +1,8 @@
 # SPDX-License-Identifier: MIT
 
+# Runs "cargo update", which updates the lock file and creates PR
+# You need to manually close/open the PR to trigger the other workflows
+
 name: cargo update
 
 on:
