@@ -62,9 +62,7 @@ pub fn suggest_needed_env_vars(template_contents: &str) {
 
     // iterate over the map and check if the env var exists
     for (varname, message) in env_vars {
-        if template_contents.contains(std::format("$${:}", varname))
-            && std::env::var(varname).is_err()
-        {
+        if template_contents.contains(varname) && std::env::var(varname).is_err() {
             println!(
                 "Env variable {} isn't set! Should be set to {}",
                 varname, message
