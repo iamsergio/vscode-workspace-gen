@@ -2,6 +2,31 @@
 
 
 
+## [1.4.0] - 2024-04-16
+
+### 🚀 Features
+
+- Add --create-cmake-presets
+- Add --create-default-vscode-workspace convenience for Qt
+
+### 📚 Documentation
+
+- Improve docs
+
+### 🧪 Testing
+
+- Remove old natvis before running test_download_qtnatvis
+
+### ⚙️ Miscellaneous Tasks
+
+- *(ci)* Pass --features qt to clippy
+- Added workflow to run cargo update
+- Rename cargo workflow name
+- Setup git author name for cargo update PR
+- Minor comments
+- Cargo update
+- Added a build.sh
+
 ## [1.3.0] - 2024-04-03
 
 ### 🚀 Features
