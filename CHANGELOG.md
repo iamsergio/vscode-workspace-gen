@@ -2,6 +2,18 @@
 
 
 
+## [1.5.0] - 2024-04-16
+
+### 🚀 Features
+
+- Warn the user if Qt env vars are missing
+
+### ⚙️ Miscellaneous Tasks
+
+- Minor rename
+- Fix build
+- Fix non-qt build
+
 ## [1.4.0] - 2024-04-16
 
 ### 🚀 Features
