@@ -65,6 +65,9 @@ pub fn generate_from_string(
     // replace $${env_var} instances
     replace_env_vars(&mut json);
 
+    #[cfg(feature = "qt")]
+    qt::suggest_needed_env_vars(template_contents);
+
     Ok(json)
 }
 
