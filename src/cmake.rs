@@ -21,7 +21,8 @@ pub fn generate_cmake_presets() -> Result<(), String> {
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-dev",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Debug"
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     },
     {
@@ -30,7 +31,8 @@ pub fn generate_cmake_presets() -> Result<(), String> {
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-rel",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release"
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       }
     }
   ]
