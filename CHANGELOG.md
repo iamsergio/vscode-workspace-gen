@@ -2,6 +2,12 @@
 
 
 
+## [1.6.0] - 2024-04-26
+
+### 🚀 Features
+
+- Generated CMakePresets.json now has CMAKE_EXPORT_COMPILE_COMMANDS
+
 ## [1.5.0] - 2024-04-16
 
 ### 🚀 Features
