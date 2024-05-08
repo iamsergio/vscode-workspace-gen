@@ -17,10 +17,7 @@
   "settings": {
     "files.trimTrailingWhitespace": true,
     "editor.formatOnSave": true,
-    "clangd.arguments": [
-      "-header-insertion=never",
-      "--clang-tidy=false"
-    ],
+    "clangd.arguments": ["-header-insertion=never", "--clang-tidy=false"],
     "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
     "files.insertFinalNewline": true,
     "files.associations": {
@@ -81,9 +78,7 @@
         "label": "Run current target under valgrind",
         "command": "/usr/bin/valgrind",
         "type": "shell",
-        "args": [
-          "${command:cmake.launchTargetPath}"
-        ],
+        "args": ["${command:cmake.launchTargetPath}"],
         "presentation": {
           "reveal": "always"
         },
@@ -115,5 +110,30 @@
         "command script import ${QT_SDK_INSTALL}/Tools/QtCreator/share/qtcreator/debugger/lldbbridge.py"
       ]
     }
+  },
+  "gen.cmakepresets": {
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "dev",
+        "description": "dev",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build-dev",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Debug",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        }
+      },
+      {
+        "name": "rel",
+        "description": "rel",
+        "generator": "Ninja",
+        "binaryDir": "${sourceDir}/build-rel",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+        }
+      }
+    ]
   }
 }

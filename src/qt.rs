@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+use crate::{config::Config, workspace::*};
 use std::io::Write;
 
 /// Provides some extra convenience for Qt:
@@ -90,17 +91,39 @@ mod tests {
 
     #[test]
     fn test_create_default_workspace() {
+        let dst_filename_template = "test.code-workspace.template";
         let dst_filename = "test.code-workspace";
-        if std::path::Path::new(dst_filename).exists() {
-            std::fs::remove_file(dst_filename).unwrap();
+        if std::path::Path::new(dst_filename_template).exists() {
+            std::fs::remove_file(dst_filename_template).unwrap();
         }
 
-        let result = generate_default_vscode_workspace(dst_filename);
+        if std::path::Path::new("CMakePresets.json").exists() {
+            std::fs::remove_file("CMakePresets.json").unwrap();
+        }
+
+        let result = generate_default_vscode_workspace(dst_filename_template);
         if let Err(e) = &result {
             eprintln!("{}", e);
             panic!("Failed to create vscode workspace");
         }
 
+        // generate from template:
+        assert!(generate_from_file(
+            dst_filename_template.to_string(),
+            dst_filename.to_string(),
+            &Config::default(),
+            std::env::consts::OS,
+        )
+        .is_ok());
+
+        // check that contents doesn't contain "gen.cmakepresets":
+        let contents = std::fs::read_to_string(dst_filename).unwrap();
+        assert!(!contents.contains("gen.cmakepresets"));
+
+        assert!(std::path::Path::new("CMakePresets.json").exists());
+
+        std::fs::remove_file("CMakePresets.json").unwrap();
+        std::fs::remove_file(dst_filename_template).unwrap();
         std::fs::remove_file(dst_filename).unwrap();
     }
 }

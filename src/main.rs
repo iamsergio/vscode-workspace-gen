@@ -12,9 +12,6 @@ mod tests;
 mod qt;
 
 #[cfg(feature = "qt")]
-mod cmake;
-
-#[cfg(feature = "qt")]
 const DEFAULT_WORKSPACE_FILE: &str = "vscode.code-workspace.template";
 
 #[derive(Parser, Debug)]
@@ -34,10 +31,6 @@ struct Args {
 
     #[cfg(feature = "qt")]
     #[arg(long)]
-    create_cmake_presets: bool,
-
-    #[cfg(feature = "qt")]
-    #[arg(long)]
     create_default_vscode_workspace: bool,
 }
 
@@ -47,9 +40,6 @@ struct Args {
 struct ArgsQt {
     #[arg(long)]
     download_qtnatvis: bool,
-
-    #[arg(long)]
-    create_cmake_presets: bool,
 
     #[arg(long)]
     create_default_vscode_workspace: bool,
@@ -66,17 +56,6 @@ fn handle_qt_usecase() {
             process::exit(match qt::download_qtnatvis() {
                 Ok(_) => {
                     println!("Downloaded qt6.natvis");
-                    0
-                }
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    1
-                }
-            });
-        } else if args.create_cmake_presets {
-            process::exit(match cmake::generate_cmake_presets() {
-                Ok(_) => {
-                    println!("Created CMakePresets.json");
                     0
                 }
                 Err(e) => {

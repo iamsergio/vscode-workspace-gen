@@ -1,5 +1,7 @@
 // SPDX-License-Identifier: MIT
 
+use std::{fs::File, io::Write};
+
 use serde::Serialize;
 use serde_json::{ser::PrettyFormatter, Serializer};
 
@@ -11,6 +13,7 @@ use crate::qt;
 const GEN_GLOBALS_KEY: &str = "gen.globals";
 const GEN_DESCRIPTION_KEY: &str = "gen.description";
 const GEN_OS_KEY: &str = "gen.os";
+const GEN_CMAKE_PRESETS_KEY: &str = "gen.cmakepresets";
 
 #[derive(Debug)]
 pub enum Error {
@@ -35,6 +38,7 @@ pub fn generate_from_file(
     let indent_str = b" ".repeat(config.json_indent() as usize);
     let formatter = PrettyFormatter::with_indent(indent_str.as_slice());
 
+    // Write to target file
     let mut serializer = Serializer::with_formatter(target_file, formatter);
     new_json.serialize(&mut serializer).map_err(Error::Json)?;
 
@@ -67,6 +71,8 @@ pub fn generate_from_string(
 
     // replace $${env_var} instances
     replace_env_vars(&mut json);
+
+    generate_cmake_presets(&mut json);
 
     #[cfg(feature = "qt")]
     qt::suggest_needed_env_vars(template_contents);
@@ -276,4 +282,16 @@ fn replace_env_vars(value: &mut serde_json::Value) {
             replace_env_vars(v);
         }
     }
+}
+
+fn generate_cmake_presets(json: &mut serde_json::Value) -> Option<()> {
+    if let Some(presets) = json.as_object()?.get(GEN_CMAKE_PRESETS_KEY) {
+        // write the pretty json to a file called CMakePresets.json
+        let mut file = File::create("CMakePresets.json").ok()?;
+        let presets_str = serde_json::to_string_pretty(presets).ok()?;
+        file.write_all(presets_str.as_bytes()).ok()?;
+    }
+
+    json.as_object_mut()?.remove(GEN_CMAKE_PRESETS_KEY);
+    Some(())
 }
