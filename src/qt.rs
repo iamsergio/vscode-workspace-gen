@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 
-use crate::{config::Config, workspace::*};
 use std::io::Write;
 
 /// Provides some extra convenience for Qt:
@@ -75,6 +74,7 @@ pub fn suggest_needed_env_vars(template_contents: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{config::Config, workspace::*};
 
     #[test]
     fn test_download_qtnatvis() {
