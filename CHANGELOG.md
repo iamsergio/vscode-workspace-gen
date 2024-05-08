@@ -2,6 +2,16 @@
 
 
 
+## [1.7.0] - 2024-05-08
+
+### 🚀 Features
+
+- Copy the cmake preset directly into the template
+
+### ⚙️ Miscellaneous Tasks
+
+- Fix warning about unused imports
+
 ## [1.6.0] - 2024-04-26
 
 ### 🚀 Features
