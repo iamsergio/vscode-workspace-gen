@@ -33,7 +33,7 @@ struct Args {
     create_default_vscode_workspace: bool,
 }
 
-fn suggest_target_filename(template_filename: &str) -> String {
+fn suggest_output_filename(template_filename: &str) -> String {
     template_filename.to_string().replace(".template", "")
 }
 
@@ -119,8 +119,13 @@ fn main() {
         last_result
     } else {
         // 3. Let's simply remove ".template" from the template filename
-        let target_filename = suggest_target_filename(&args.template_filename.clone().unwrap());
-        workspace::generate_from_file(template_filename, target_filename, &config, env::consts::OS)
+        let suggested_filename = suggest_output_filename(&args.template_filename.clone().unwrap());
+        workspace::generate_from_file(
+            template_filename,
+            suggested_filename,
+            &config,
+            env::consts::OS,
+        )
     };
 
     match result {
