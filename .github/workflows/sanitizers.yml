@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        sanitizer: [ "address", "leak", "memory", "thread" ]
+        sanitizer: ["address", "leak", "memory", "thread"]
 
     steps:
       - name: Checkout sources
@@ -29,6 +29,6 @@ jobs:
 
       - name: Run tests
         run: |
-          cargo test -Zbuild-std --target x86_64-unknown-linux-gnu
+          cargo test --no-default-features -Zbuild-std --target x86_64-unknown-linux-gnu
         env:
           RUSTFLAGS: "-Zsanitizer=${{ matrix.sanitizer }}"
