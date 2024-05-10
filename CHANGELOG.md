@@ -2,6 +2,21 @@
 
 
 
+## [2.1.0] - 2024-05-10
+
+### 🚀 Features
+
+- Qt is now a default feature
+
+### 🐛 Bug Fixes
+
+- Fix location of output filename when not specified
+
+### ⚙️ Miscellaneous Tasks
+
+- Minor renaming
+- Pass --no-default-features
+
 ## [2.0.0] - 2024-05-10
 
 ### 🚀 Features
