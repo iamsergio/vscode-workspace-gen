@@ -21,26 +21,14 @@ struct Args {
     #[arg(short, long)]
     output_filename: Option<String>,
 
-    template_filename: String,
+    #[arg(short, long)]
+    template_filename: Option<String>,
 
-    // HACK: Just so it appears in the help. Actual processing is done by ArgsQt.
-    // Need to find out how to support 2 sets of argument options
     #[cfg(feature = "qt")]
     #[arg(long)]
     download_qtnatvis: bool,
 
     #[cfg(feature = "qt")]
-    #[arg(long)]
-    create_default_vscode_workspace: bool,
-}
-
-#[cfg(feature = "qt")]
-#[derive(Parser, Debug)]
-#[command(author, version, about, long_about = None)]
-struct ArgsQt {
-    #[arg(long)]
-    download_qtnatvis: bool,
-
     #[arg(long)]
     create_default_vscode_workspace: bool,
 }
@@ -51,7 +39,7 @@ fn suggest_target_filename(template_filename: &str) -> String {
 
 #[cfg(feature = "qt")]
 fn handle_qt_usecase() {
-    if let Ok(args) = ArgsQt::try_parse() {
+    if let Ok(args) = Args::try_parse() {
         if args.download_qtnatvis {
             process::exit(match qt::download_qtnatvis() {
                 Ok(_) => {
@@ -81,7 +69,7 @@ fn handle_qt_usecase() {
 }
 
 fn main() {
-    // Handle --download-qtnatvis
+    // Handle --download-qtnatvis. Exits if handled.
     #[cfg(feature = "qt")]
     handle_qt_usecase();
 
@@ -97,23 +85,28 @@ fn main() {
         process::exit(-1);
     }
 
-    let result: Result<(), workspace::Error> = if let Some(target_filename) = &args.output_filename
+    let template_filename = args
+        .template_filename
+        .clone()
+        .expect("You're expected to pass: -t <template_filename>");
+
+    let result: Result<(), workspace::Error> = if let Some(output_filename) = &args.output_filename
     {
-        // Case 1. User passed -o <target_filename>
+        // Case 1. User passed -o <output_filename>
         workspace::generate_from_file(
-            args.template_filename,
-            target_filename.to_string(),
+            template_filename,
+            output_filename.to_string(),
             &config,
             env::consts::OS,
         )
-    } else if config.has_target() {
+    } else if config.has_output() {
         // Case 2. There's a .vscode-workspace-gen.json config file with either 'output_filename' or 'per_os_output_filename's set
-        let targets = config.targets().expect("Config has no usable targets");
+        let targets = config.outputs().expect("Config has no usable targets");
         let mut last_result: Result<(), workspace::Error> = Ok(());
-        for (os, target_filename) in targets {
+        for (os, output_filename) in targets {
             last_result = workspace::generate_from_file(
-                args.template_filename.clone(),
-                target_filename.clone(),
+                template_filename.clone(),
+                output_filename.clone(),
                 &config,
                 os,
             );
@@ -126,13 +119,8 @@ fn main() {
         last_result
     } else {
         // 3. Let's simply remove ".template" from the template filename
-        let target_filename = suggest_target_filename(&args.template_filename);
-        workspace::generate_from_file(
-            args.template_filename,
-            target_filename,
-            &config,
-            env::consts::OS,
-        )
+        let target_filename = suggest_target_filename(&args.template_filename.clone().unwrap());
+        workspace::generate_from_file(template_filename, target_filename, &config, env::consts::OS)
     };
 
     match result {

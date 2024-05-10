@@ -33,7 +33,7 @@ pub fn generate_from_file(
     let new_json = generate_from_string(&template_contents, current_os)?;
 
     // write json to target file
-    let target_file = std::fs::File::create(target_filename).map_err(Error::Io)?;
+    let target_file = std::fs::File::create(target_filename.clone()).map_err(Error::Io)?;
 
     let indent_str = b" ".repeat(config.json_indent() as usize);
     let formatter = PrettyFormatter::with_indent(indent_str.as_slice());
@@ -41,6 +41,12 @@ pub fn generate_from_file(
     // Write to target file
     let mut serializer = Serializer::with_formatter(target_file, formatter);
     new_json.serialize(&mut serializer).map_err(Error::Json)?;
+
+    println!("Suggested target filename: {}", target_filename);
+
+    // print cwd:
+    let cwd = std::env::current_dir().unwrap();
+    println!("Current working directory: {}", cwd.display());
 
     Ok(())
 }

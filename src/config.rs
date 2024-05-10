@@ -64,13 +64,13 @@ impl Config {
         }
     }
 
-    pub fn has_target(&self) -> bool {
+    pub fn has_output(&self) -> bool {
         self.output_filename.is_some() || self.per_os_output_filenames.is_some()
     }
 
     // returns a list of tuples with the OS and the output filename
     // else returns current OS
-    pub fn targets(&self) -> Option<Vec<(&str, &String)>> {
+    pub fn outputs(&self) -> Option<Vec<(&str, &String)>> {
         match &self.per_os_output_filenames {
             Some(per_os_output) => {
                 let mut targets = Vec::new();
