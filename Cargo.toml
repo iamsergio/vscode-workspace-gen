@@ -4,10 +4,7 @@
 name = "vscode-workspace-gen"
 version = "2.0.0"
 edition = "2021"
-exclude = [
-    ".github/*",
-    "vscode*"
-]
+exclude = [".github/*", "vscode*"]
 homepage = "https://github.com/iamsergio/vscode-workspace-gen"
 repository = "https://github.com/iamsergio/vscode-workspace-gen"
 license = "MIT"
@@ -18,9 +15,10 @@ categories = ["command-line-utilities"]
 [dependencies]
 clap = { version = "4.5.0", features = ["derive"] }
 regex = "1.10.4"
-reqwest = { version ="0.12.2", optional = true, features = ["blocking"] }
+reqwest = { version = "0.12.2", optional = true, features = ["blocking"] }
 serde = { version = "1.0.197", features = ["derive"] }
 serde_json = { version = "1.0.115", features = ["preserve_order", "indexmap"] }
 
 [features]
 qt = ["dep:reqwest"]
+default = ["qt"]
