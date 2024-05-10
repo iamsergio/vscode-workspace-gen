@@ -2,6 +2,16 @@
 
 
 
+## [2.0.0] - 2024-05-10
+
+### 🚀 Features
+
+- [**breaking**] Cleanup args handling
+
+### ⚙️ Miscellaneous Tasks
+
+- Remove unneeded strategy from ci yml file
+
 ## [1.7.0] - 2024-05-08
 
 ### 🚀 Features
