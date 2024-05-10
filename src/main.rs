@@ -33,7 +33,14 @@ struct Args {
     create_default_vscode_workspace: bool,
 }
 
+// suggestion is relative to cwd
 fn suggest_output_filename(template_filename: &str) -> String {
+    // get basename
+    let template_filename = std::path::Path::new(template_filename)
+        .file_name()
+        .unwrap()
+        .to_str()
+        .unwrap();
     template_filename.to_string().replace(".template", "")
 }
 
