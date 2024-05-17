@@ -27,7 +27,6 @@ pub fn download_qtnatvis() -> Result<(), String> {
 }
 
 pub fn generate_default_vscode_workspace(dst_filename: &str) -> Result<(), String> {
-    // Read the file templates/qt.code-workspace.template using include_bytes
     let template_contents = include_bytes!("../templates/qt.code-workspace.template");
     if template_contents.is_empty() {
         return Err("Template is empty".to_string());

@@ -5,6 +5,8 @@ use std::{env, process};
 mod workspace;
 
 mod config;
+mod cpp;
+
 #[cfg(test)]
 mod tests;
 
@@ -31,6 +33,10 @@ struct Args {
     #[cfg(feature = "qt")]
     #[arg(long)]
     create_default_vscode_workspace: bool,
+
+    #[cfg(feature = "cpp")]
+    #[arg(long)]
+    create_clang_format: bool,
 }
 
 // suggestion is relative to cwd
@@ -42,6 +48,24 @@ fn suggest_output_filename(template_filename: &str) -> String {
         .to_str()
         .unwrap();
     template_filename.to_string().replace(".template", "")
+}
+
+#[cfg(feature = "cpp")]
+fn handle_cpp_usecase() {
+    if let Ok(args) = Args::try_parse() {
+        if args.create_clang_format {
+            process::exit(match cpp::generate_clang_format() {
+                Ok(_) => {
+                    println!("Created .clang-format");
+                    0
+                }
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    1
+                }
+            });
+        }
+    }
 }
 
 #[cfg(feature = "qt")]
@@ -79,6 +103,10 @@ fn main() {
     // Handle --download-qtnatvis. Exits if handled.
     #[cfg(feature = "qt")]
     handle_qt_usecase();
+
+    // Handle --create-clang-format. Exits if handled.
+    #[cfg(feature = "cpp")]
+    handle_cpp_usecase();
 
     // Handle the main use case:
 
