@@ -2,6 +2,17 @@
 
 
 
+## [2.2.0] - 2024-05-17
+
+### 🚀 Features
+
+- Add --create-clang-format option
+
+### ⚙️ Miscellaneous Tasks
+
+- Don't specify features when running clippy
+- Run tests for feature cpp as well
+
 ## [2.1.0] - 2024-05-10
 
 ### 🚀 Features
