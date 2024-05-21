@@ -11,16 +11,12 @@ specify json objects you want to reuse and then reference them instead of duplic
 
 `cargo install vscode-workspace-gen`
 
-or, if you're a Qt user:
-
-`cargo install vscode-workspace-gen --features qt`
-
 ## Usage:
 
 A real scenario could be factoring-out duplicated vscode launches, pretty printers and source map settings.<br>
 For the purpose of this example we'll just show some dummy JSON instead.
 
-Add every object you want to reuse to the `globals` section.
+Add every object you want to reuse to the `gen.globals` section.
 
 ```
 {
@@ -41,7 +37,7 @@ Add every object you want to reuse to the `globals` section.
 ```
 
 Run it on your template:<br>
-`vscode-workspace-gen vscode.code-workspace.template`
+`vscode-workspace-gen -t vscode.code-workspace.template`
 
 and get:
 
@@ -146,6 +142,8 @@ Any occurrence of `$${env_var}` will be replaced with the env var's contents. Th
 If you passed `--features qt` to `cargo install`, you have some convenience options regarding Qt.
 For now, it adds:
 - `--download_qtnatvis` Downloads the `qt6.natvis`, which contains pretty printers for debugging Qt.
+- `--create-default-vscode-workspace` Creates a vscode template suitable for Qt development.
+- `--create-clang-format` Creates a .clang-format file for C++
 
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>
