@@ -2,6 +2,16 @@
 
 
 
+## [2.2.3] - 2024-05-21
+
+### 🐛 Bug Fixes
+
+- Fix message about workspace being generated
+
+### 📚 Documentation
+
+- Remove trailing commas from example
+
 ## [2.2.2] - 2024-05-21
 
 ### 🐛 Bug Fixes
