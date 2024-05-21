@@ -28,10 +28,10 @@ Add every object you want to reuse to the `gen.globals` section.
         }
     },
     "obj1": {
-        "a": "@{numbers}",
+        "a": "@{numbers}"
     },
     "obj2": {
-        "b": "@{numbers}",
+        "b": "@{numbers}"
     }
 }
 ```
