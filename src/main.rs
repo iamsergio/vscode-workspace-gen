@@ -164,7 +164,7 @@ fn main() {
     };
 
     match result {
-        Ok(_) => println!("Workspace generated successfully"),
+        Ok(_) => println!("File generated successfully"),
         Err(e) => {
             match e {
                 workspace::Error::ExpectedRootObject => {
