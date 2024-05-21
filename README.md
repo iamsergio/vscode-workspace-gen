@@ -149,4 +149,4 @@ For now, it adds:
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/lints.yml/badge.svg)
 </br>
-[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) Please fork and fix your issues.
