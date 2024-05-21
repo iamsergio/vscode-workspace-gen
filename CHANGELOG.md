@@ -2,6 +2,16 @@
 
 
 
+## [2.2.2] - 2024-05-21
+
+### 🐛 Bug Fixes
+
+- Fix outdated README
+
+### 📚 Documentation
+
+- Explain people should fix their issues instead of reporting
+
 ## [2.2.1] - 2024-05-20
 
 ### ⚙️ Miscellaneous Tasks
