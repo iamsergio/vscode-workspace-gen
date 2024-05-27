@@ -6,6 +6,7 @@ mod workspace;
 
 mod config;
 mod cpp;
+mod project;
 
 #[cfg(test)]
 mod tests;
