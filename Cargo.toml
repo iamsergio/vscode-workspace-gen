@@ -22,4 +22,5 @@ serde_json = { version = "1.0.115", features = ["preserve_order", "indexmap"] }
 [features]
 qt = ["dep:reqwest"]
 cpp = []
-default = ["qt", "cpp"]
+projects = []
+default = ["qt", "cpp", "projects"]

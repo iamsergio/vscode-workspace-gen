@@ -7,32 +7,47 @@
 use std::path::PathBuf;
 
 pub fn list_root_project_folder() -> Result<Vec<Project>, String> {
-    let root_path = std::env::var("VSCODE_WORKSPACE_GEN_FOLDERS").unwrap_or("".to_string());
+    let root_path = projects_root_path()?;
 
-    // check if folder_path is a directory and exists
-    if root_path.is_empty() {
-        return Err("No projects found".to_string());
-    }
-
-    let path = std::path::Path::new(&root_path);
-    if !path.exists() {
+    if !root_path.exists() {
         return Err("Project does not exist".to_string());
     }
 
-    if !path.is_dir() {
+    if !root_path.is_dir() {
         return Err("Path is not a directory".to_string());
     }
 
-    let project_json_path = path.join("project.json");
+    let project_json_path = root_path.join("project.json");
     if project_json_path.exists() {
         return Err("root should not contain a project.json file".to_string());
     }
 
-    list_folder(path)
+    list_folder(root_path.as_path())
+}
+
+fn projects_root_path() -> Result<std::path::PathBuf, String> {
+    let path_str = std::env::var("VSCODE_WORKSPACE_GEN_FOLDERS").map_err(|e| e.to_string())?;
+
+    let path = std::path::PathBuf::from(&path_str);
+    Ok(path)
+}
+
+pub fn print_projects() -> Result<(), String> {
+    let projects = list_root_project_folder()?;
+    for project in projects {
+        println!(
+            "{}: {}",
+            project.clone().project_id(projects_root_path()?.as_path()),
+            project.description
+        );
+    }
+    Ok(())
 }
 
 /// Describes the content of a project.json
-struct Project {
+
+#[derive(Clone)]
+pub struct Project {
     path: PathBuf,
     description: String,
 }
@@ -50,6 +65,13 @@ impl Project {
             project_json_path,
             json["description"].as_str().unwrap().to_string(),
         )
+    }
+
+    /// The id is simply the path of the project.json file, without the prefix of the root folder
+    fn project_id(self, root_path: &std::path::Path) -> String {
+        let id = self.path.clone();
+        let id = id.strip_prefix(root_path).unwrap();
+        String::from(id.to_str().unwrap())
     }
 }
 
