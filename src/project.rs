@@ -6,6 +6,8 @@
 
 use std::path::PathBuf;
 
+use comfy_table::Table;
+
 pub fn list_root_project_folder() -> Result<Vec<Project>, String> {
     let root_path = projects_root_path()?;
 
@@ -34,13 +36,17 @@ fn projects_root_path() -> Result<std::path::PathBuf, String> {
 
 pub fn print_projects() -> Result<(), String> {
     let projects = list_root_project_folder()?;
+    let mut table = Table::new();
+    table.set_header(vec!["Description", "ID"]);
+
     for project in projects {
-        println!(
-            "{}: {}",
-            project.clone().project_id(projects_root_path()?.as_path()),
-            project.description
-        );
+        table.add_row(vec![
+            project.clone().description,
+            project.project_id(projects_root_path()?.as_path()),
+        ]);
     }
+    println!("{table}");
+
     Ok(())
 }
 
@@ -70,7 +76,10 @@ impl Project {
     /// The id is simply the path of the project.json file, without the prefix of the root folder
     fn project_id(self, root_path: &std::path::Path) -> String {
         let id = self.path.clone();
+        // get path without the filename:
+        let id = id.parent().unwrap();
         let id = id.strip_prefix(root_path).unwrap();
+
         String::from(id.to_str().unwrap())
     }
 }
