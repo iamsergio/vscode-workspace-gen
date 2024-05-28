@@ -44,6 +44,10 @@ struct Args {
     #[cfg(feature = "projects")]
     #[arg(long)]
     list_projects: bool,
+
+    #[cfg(feature = "projects")]
+    #[arg(long)]
+    create_project: Option<String>,
 }
 
 // suggestion is relative to cwd
@@ -117,6 +121,17 @@ fn handle_projects_usecase() {
                     1
                 }
             });
+        } else if let Some(proj) = args.create_project {
+            let output_filename = args.output_filename.clone();
+            process::exit(
+                match project::create_project(proj.as_str(), output_filename) {
+                    Ok(_) => 0,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        1
+                    }
+                },
+            );
         }
     }
 }

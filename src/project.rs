@@ -82,6 +82,13 @@ impl Project {
 
         String::from(id.to_str().unwrap())
     }
+
+    fn base_folder(&self) -> Option<String> {
+        let parent = self.path.parent().unwrap();
+        parent
+            .file_name()
+            .map(|name| name.to_str().unwrap().to_string())
+    }
 }
 
 fn list_folder(path: &std::path::Path) -> Result<Vec<Project>, String> {
@@ -94,17 +101,67 @@ fn list_folder(path: &std::path::Path) -> Result<Vec<Project>, String> {
             let project_path = path.join("project.json");
             if project_path.exists() {
                 result.push(Project::from_file(project_path));
+            } else if let Ok(sub_project) = list_folder(&path) {
+                result.extend(sub_project);
             } else {
-                if let Ok(sub_project) = list_folder(&path) {
-                    result.extend(sub_project);
-                } else {
-                    return Err("Error reading sub-folder".to_string());
-                }
+                return Err("Error reading sub-folder".to_string());
             }
         }
     }
 
     Ok(result)
+}
+
+pub fn get_project(project_id: &str) -> Result<Project, String> {
+    let root_path = projects_root_path()?;
+    let project_path = root_path.join(project_id);
+
+    if !project_path.exists() {
+        return Err("Project does not exist".to_string());
+    }
+
+    if !project_path.is_dir() {
+        return Err("Path is not a directory".to_string());
+    }
+
+    let project_json_path = project_path.join("project.json");
+    if !project_json_path.exists() {
+        return Err("Project does not contain a project.json file".to_string());
+    }
+
+    Ok(Project::from_file(project_json_path))
+}
+
+pub fn create_project(project_id: &str, output_filename: Option<String>) -> Result<(), String> {
+    let project = get_project(project_id)?;
+
+    let target_path = if output_filename.is_none() {
+        std::env::current_dir().unwrap().join(
+            project
+                .base_folder()
+                .ok_or("Could not get base folder".to_string())?,
+        )
+    } else {
+        // check if output_filename is absolute:
+        let output_filename = output_filename.unwrap();
+        let target_path = std::path::PathBuf::from(&output_filename);
+        if target_path.is_absolute() {
+            target_path
+        } else {
+            std::env::current_dir().unwrap().join(target_path)
+        }
+    };
+
+    if target_path.exists() {
+        return Err(std::format!(
+            "Target path already exists {}",
+            target_path.display()
+        ));
+    }
+
+    copy_dir::copy_dir(project.path.parent().unwrap(), &target_path).unwrap();
+
+    Ok(())
 }
 
 #[cfg(test)]
@@ -130,5 +187,39 @@ mod tests {
         for r in result.iter() {
             assert_eq!(r.path.file_name().unwrap(), "project.json");
         }
+    }
+
+    fn set_root_folder() {
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("test_data/projects_folder");
+
+        // set env VSCODE_WORKSPACE_GEN_FOLDERS
+        std::env::set_var("VSCODE_WORKSPACE_GEN_FOLDERS", d.to_str().unwrap());
+    }
+
+    #[test]
+    fn test_get_project() {
+        set_root_folder();
+        let proj = get_project("c/d").unwrap();
+        assert_eq!(proj.base_folder().unwrap(), "d");
+    }
+
+    #[test]
+    fn test_create_project() {
+        set_root_folder();
+
+        create_project("c/d", None).unwrap();
+
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("d");
+
+        assert!(d.exists());
+        std::fs::remove_dir_all(d).unwrap();
+
+        create_project("c/d", Some("foo".to_string())).unwrap();
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("foo");
+        assert!(d.exists());
+        std::fs::remove_dir_all(d).unwrap();
     }
 }
