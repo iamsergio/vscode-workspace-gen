@@ -2,6 +2,15 @@
 
 
 
+## [2.3.0] - 2024-05-28
+
+### 🚀 Features
+
+- Added project.rs
+- Added --list-projects
+- Projects are printed with comfy_table now
+- Added --create-project
+
 ## [2.2.3] - 2024-05-21
 
 ### 🐛 Bug Fixes
