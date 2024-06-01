@@ -42,12 +42,15 @@ struct Args {
     create_clang_format: bool,
 
     #[cfg(feature = "projects")]
-    #[arg(long)]
-    list_projects: bool,
+    #[command(flatten)]
+    projects: CreateProjArgs,
+}
 
-    #[cfg(feature = "projects")]
-    #[arg(long)]
-    create_project: Option<String>,
+#[cfg(feature = "projects")]
+#[derive(Debug, Clone, clap::Args)]
+struct CreateProjArgs {
+    #[arg(short, long)]
+    create_project: Option<Option<String>>,
 }
 
 // suggestion is relative to cwd
@@ -113,25 +116,27 @@ fn handle_qt_usecase() {
 #[cfg(feature = "projects")]
 fn handle_projects_usecase() {
     if let Ok(args) = Args::try_parse() {
-        if args.list_projects {
-            process::exit(match project::print_projects() {
-                Ok(_) => 0,
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    1
-                }
-            });
-        } else if let Some(proj) = args.create_project {
-            let output_filename = args.output_filename.clone();
-            process::exit(
-                match project::create_project(proj.as_str(), output_filename) {
+        if let Some(proj) = args.projects.create_project {
+            if let Some(proj) = proj {
+                let output_filename = args.output_filename.clone();
+                process::exit(
+                    match project::create_project(proj.as_str(), output_filename) {
+                        Ok(_) => 0,
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                            1
+                        }
+                    },
+                );
+            } else {
+                process::exit(match project::print_projects() {
                     Ok(_) => 0,
                     Err(e) => {
                         eprintln!("Error: {}", e);
                         1
                     }
-                },
-            );
+                });
+            }
         }
     }
 }
@@ -145,7 +150,7 @@ fn main() {
     #[cfg(feature = "cpp")]
     handle_cpp_usecase();
 
-    // Handle --list-projects. Exits if handled.
+    // Handle --create-project. Exits if handled.
     #[cfg(feature = "projects")]
     handle_projects_usecase();
 
