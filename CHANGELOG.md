@@ -2,6 +2,20 @@
 
 
 
+## [3.0.0] - 2024-06-01
+
+### 🚀 Features
+
+- -c is now short-hand for --create project
+- Allow to copy projects without their parent folder
+- [**breaking**] Remove qt feature
+
+### ⚙️ Miscellaneous Tasks
+
+- Use serde deserialize to read to struct in one go
+- Minor rename
+- Minor refactoring for readability
+
 ## [2.3.0] - 2024-05-28
 
 ### 🚀 Features
