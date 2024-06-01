@@ -132,34 +132,36 @@ pub fn get_project(project_id: &str) -> Result<Project, String> {
     Ok(Project::from_file(project_json_path))
 }
 
+fn absolute_path(output_dir: &str) -> PathBuf {
+    let target_path = std::path::PathBuf::from(&output_dir);
+    if target_path.is_absolute() {
+        target_path
+    } else {
+        std::env::current_dir().unwrap().join(target_path)
+    }
+}
+
 pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
     let project = get_project(project_id)?;
 
-    let target_path = if output_dir.is_none() {
+    let absolute_target_path = if let Some(output_dir) = output_dir {
+        absolute_path(output_dir.as_str())
+    } else {
         std::env::current_dir().unwrap().join(
             project
                 .base_folder()
                 .ok_or("Could not get base folder".to_string())?,
         )
-    } else {
-        // check if output_filename is absolute:
-        let output_filename = output_dir.unwrap();
-        let target_path = std::path::PathBuf::from(&output_filename);
-        if target_path.is_absolute() {
-            target_path
-        } else {
-            std::env::current_dir().unwrap().join(target_path)
-        }
     };
 
-    if target_path.exists() {
+    if absolute_target_path.exists() {
         return Err(std::format!(
             "Target path already exists {}",
-            target_path.display()
+            absolute_target_path.display()
         ));
     }
 
-    copy_dir::copy_dir(project.path.parent().unwrap(), &target_path).unwrap();
+    copy_dir::copy_dir(project.path.parent().unwrap(), &absolute_target_path).unwrap();
 
     Ok(())
 }
