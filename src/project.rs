@@ -55,10 +55,18 @@ pub fn print_projects() -> Result<(), String> {
 
 #[derive(Clone, Deserialize)]
 pub struct Project {
+    /// The path of the project.json
     #[serde(skip)]
     path: PathBuf,
 
     description: String,
+
+    #[serde(default = "default_no_parent_dir")]
+    no_parent_dir: bool,
+}
+
+fn default_no_parent_dir() -> bool {
+    false
 }
 
 impl Project {
@@ -88,6 +96,13 @@ impl Project {
         parent
             .file_name()
             .map(|name| name.to_str().unwrap().to_string())
+    }
+
+    fn project_source_folder(&self) -> Result<PathBuf, String> {
+        self.path
+            .parent()
+            .map(|p| p.to_path_buf())
+            .ok_or("Could not get parent folder".to_string())
     }
 }
 
@@ -141,8 +156,13 @@ fn absolute_path(output_dir: &str) -> PathBuf {
     }
 }
 
+/// Creates a new folder with the project
 pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
     let project = get_project(project_id)?;
+
+    if project.no_parent_dir {
+        return create_project_from_contents(project, output_dir);
+    }
 
     let absolute_target_path = if let Some(output_dir) = output_dir {
         absolute_path(output_dir.as_str())
@@ -162,6 +182,46 @@ pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<()
     }
 
     copy_dir::copy_dir(project.path.parent().unwrap(), &absolute_target_path).unwrap();
+
+    Ok(())
+}
+
+/// Creates the project but only copies the src contents, not the src directory itself
+/// Useful to create a few files in the current directory
+/// For now only copies files, not sub-directories, as it's not needed yet
+fn create_project_from_contents(
+    project: Project,
+    output_dir: Option<String>,
+) -> Result<(), String> {
+    let absolute_target_path = if let Some(output_dir) = output_dir {
+        absolute_path(output_dir.as_str())
+    } else {
+        std::env::current_dir().unwrap()
+    };
+
+    if !absolute_target_path.exists() {
+        return Err(std::format!(
+            "Target path doesn't exist {}",
+            absolute_target_path.display()
+        ));
+    }
+
+    let src_path = project.project_source_folder()?;
+
+    // iterate src_path contents and copy files only
+    for entry in std::fs::read_dir(src_path).unwrap() {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        if entry.file_name() == "project.json" {
+            continue;
+        }
+
+        if path.is_file() {
+            let target_path = absolute_target_path.join(path.file_name().unwrap());
+            std::fs::copy(&path, &target_path).unwrap();
+        }
+    }
 
     Ok(())
 }
@@ -223,5 +283,20 @@ mod tests {
         d.push("foo");
         assert!(d.exists());
         std::fs::remove_dir_all(d).unwrap();
+    }
+
+    #[test]
+    fn test_create_project_noparent() {
+        set_root_folder();
+        create_project("a", None).unwrap();
+
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("a");
+
+        assert!(!d.exists());
+        d.pop();
+        d.push("this.txt");
+        assert!(d.exists());
+        std::fs::remove_file(d).unwrap();
     }
 }
