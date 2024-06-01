@@ -132,10 +132,10 @@ pub fn get_project(project_id: &str) -> Result<Project, String> {
     Ok(Project::from_file(project_json_path))
 }
 
-pub fn create_project(project_id: &str, output_filename: Option<String>) -> Result<(), String> {
+pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
     let project = get_project(project_id)?;
 
-    let target_path = if output_filename.is_none() {
+    let target_path = if output_dir.is_none() {
         std::env::current_dir().unwrap().join(
             project
                 .base_folder()
@@ -143,7 +143,7 @@ pub fn create_project(project_id: &str, output_filename: Option<String>) -> Resu
         )
     } else {
         // check if output_filename is absolute:
-        let output_filename = output_filename.unwrap();
+        let output_filename = output_dir.unwrap();
         let target_path = std::path::PathBuf::from(&output_filename);
         if target_path.is_absolute() {
             target_path
