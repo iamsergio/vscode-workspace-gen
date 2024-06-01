@@ -7,6 +7,7 @@
 use std::path::PathBuf;
 
 use comfy_table::Table;
+use serde::Deserialize;
 
 pub fn list_root_project_folder() -> Result<Vec<Project>, String> {
     let root_path = projects_root_path()?;
@@ -52,25 +53,24 @@ pub fn print_projects() -> Result<(), String> {
 
 /// Describes the content of a project.json
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct Project {
+    #[serde(skip)]
     path: PathBuf,
+
     description: String,
 }
 
 impl Project {
-    fn new(path: PathBuf, description: String) -> Self {
-        Self { path, description }
+    fn new(path: PathBuf, json: Project) -> Self {
+        Self { path, ..json }
     }
 
     fn from_file(project_json_path: PathBuf) -> Self {
         let contents = std::fs::read_to_string(&project_json_path).unwrap();
 
-        let json: serde_json::Value = serde_json::from_str(&contents).unwrap();
-        Self::new(
-            project_json_path,
-            json["description"].as_str().unwrap().to_string(),
-        )
+        let json: Project = serde_json::from_str(&contents).unwrap();
+        Self::new(project_json_path, json)
     }
 
     /// The id is simply the path of the project.json file, without the prefix of the root folder
