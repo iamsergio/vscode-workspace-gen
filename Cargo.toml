@@ -2,7 +2,7 @@
 
 [package]
 name = "vscode-workspace-gen"
-version = "2.3.0"
+version = "2.4.0"
 edition = "2021"
 exclude = [".github/*", "vscode*"]
 homepage = "https://github.com/iamsergio/vscode-workspace-gen"

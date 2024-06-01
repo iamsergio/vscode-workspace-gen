@@ -2,6 +2,16 @@
 
 
 
+## [2.4.0] - 2024-06-01
+
+### 🚀 Features
+
+- -c is now short-hand for --create project
+
+### ⚙️ Miscellaneous Tasks
+
+- Use serde deserialize to read to struct in one go
+
 ## [2.3.0] - 2024-05-28
 
 ### 🚀 Features
