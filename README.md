@@ -2,7 +2,7 @@
 
 A cli tool for generating vscode workspace files from a template.<br>
 
-The goal is to workaround https://github.com/microsoft/vscode/issues/53557 
+The goal is to workaround https://github.com/microsoft/vscode/issues/53557
 
 vscode settings and workspace files suffer from huge json duplication. With this tool you can
 specify json objects you want to reuse and then reference them instead of duplicating.
@@ -143,7 +143,6 @@ If you passed `--features qt` to `cargo install`, you have some convenience opti
 For now, it adds:
 - `--download_qtnatvis` Downloads the `qt6.natvis`, which contains pretty printers for debugging Qt.
 - `--create-default-vscode-workspace` Creates a vscode template suitable for Qt development.
-- `--create-clang-format` Creates a .clang-format file for C++
 
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/tests.yml/badge.svg)</br>
 ![Build](https://github.com/iamsergio/vscode-workspace-gen/actions/workflows/sanitizers.yml/badge.svg)</br>

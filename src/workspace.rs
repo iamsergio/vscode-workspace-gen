@@ -7,7 +7,6 @@ use serde_json::{ser::PrettyFormatter, Serializer};
 
 use crate::config::Config;
 
-#[cfg(feature = "qt")]
 use crate::qt;
 
 const GEN_GLOBALS_KEY: &str = "gen.globals";
@@ -80,7 +79,6 @@ pub fn generate_from_string(
 
     generate_cmake_presets(&mut json);
 
-    #[cfg(feature = "qt")]
     qt::suggest_needed_env_vars(template_contents);
 
     Ok(json)

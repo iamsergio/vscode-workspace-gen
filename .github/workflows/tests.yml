@@ -20,12 +20,4 @@ jobs:
 
       - name: Run tests (no features)
         run: |
-          cargo test --no-default-features
-
-      - name: Run tests (Qt)
-        run: |
-          cargo test --no-default-features --features qt
-
-      - name: Run tests (cpp)
-        run: |
-          cargo test --no-default-features --features cpp
+          cargo test

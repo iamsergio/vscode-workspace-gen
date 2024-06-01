@@ -2,22 +2,14 @@
 
 use clap::Parser;
 use std::{env, process};
-mod workspace;
 
 mod config;
-mod cpp;
-
-#[cfg(feature = "projects")]
 mod project;
+mod qt;
+mod workspace;
 
 #[cfg(test)]
 mod tests;
-
-#[cfg(feature = "qt")]
-mod qt;
-
-#[cfg(feature = "qt")]
-const DEFAULT_WORKSPACE_FILE: &str = "vscode.code-workspace.template";
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -29,24 +21,10 @@ struct Args {
     #[arg(short, long)]
     template_filename: Option<String>,
 
-    #[cfg(feature = "qt")]
-    #[arg(long)]
-    download_qtnatvis: bool,
-
-    #[cfg(feature = "qt")]
-    #[arg(long)]
-    create_default_vscode_workspace: bool,
-
-    #[cfg(feature = "cpp")]
-    #[arg(long)]
-    create_clang_format: bool,
-
-    #[cfg(feature = "projects")]
     #[command(flatten)]
     projects: CreateProjArgs,
 }
 
-#[cfg(feature = "projects")]
 #[derive(Debug, Clone, clap::Args)]
 struct CreateProjArgs {
     #[arg(short, long)]
@@ -64,56 +42,6 @@ fn suggest_output_filename(template_filename: &str) -> String {
     template_filename.to_string().replace(".template", "")
 }
 
-#[cfg(feature = "cpp")]
-fn handle_cpp_usecase() {
-    if let Ok(args) = Args::try_parse() {
-        if args.create_clang_format {
-            process::exit(match cpp::generate_clang_format() {
-                Ok(_) => {
-                    println!("Created .clang-format");
-                    0
-                }
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    1
-                }
-            });
-        }
-    }
-}
-
-#[cfg(feature = "qt")]
-fn handle_qt_usecase() {
-    if let Ok(args) = Args::try_parse() {
-        if args.download_qtnatvis {
-            process::exit(match qt::download_qtnatvis() {
-                Ok(_) => {
-                    println!("Downloaded qt6.natvis");
-                    0
-                }
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    1
-                }
-            });
-        } else if args.create_default_vscode_workspace {
-            process::exit(
-                match qt::generate_default_vscode_workspace(DEFAULT_WORKSPACE_FILE) {
-                    Ok(_) => {
-                        println!("Created vscode.code-workspace.template");
-                        0
-                    }
-                    Err(e) => {
-                        eprintln!("Error: {}", e);
-                        1
-                    }
-                },
-            );
-        }
-    }
-}
-
-#[cfg(feature = "projects")]
 fn handle_projects_usecase() {
     if let Ok(args) = Args::try_parse() {
         if let Some(proj) = args.projects.create_project {
@@ -142,16 +70,7 @@ fn handle_projects_usecase() {
 }
 
 fn main() {
-    // Handle --download-qtnatvis. Exits if handled.
-    #[cfg(feature = "qt")]
-    handle_qt_usecase();
-
-    // Handle --create-clang-format. Exits if handled.
-    #[cfg(feature = "cpp")]
-    handle_cpp_usecase();
-
     // Handle --create-project. Exits if handled.
-    #[cfg(feature = "projects")]
     handle_projects_usecase();
 
     // Handle the main use case:
