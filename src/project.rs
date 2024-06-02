@@ -38,12 +38,13 @@ fn projects_root_path() -> Result<std::path::PathBuf, String> {
 pub fn print_projects() -> Result<(), String> {
     let projects = list_root_project_folder()?;
     let mut table = Table::new();
-    table.set_header(vec!["Description", "ID"]);
+    table.set_header(vec!["Description", "ID", "Type"]);
 
     for project in projects {
         table.add_row(vec![
             project.clone().description,
-            project.project_id(projects_root_path()?.as_path()),
+            project.clone().project_id(projects_root_path()?.as_path()),
+            project.type_str.unwrap_or("".to_string()),
         ]);
     }
     println!("{table}");
@@ -63,6 +64,11 @@ pub struct Project {
 
     #[serde(default = "default_no_parent_dir")]
     no_parent_dir: bool,
+
+    /// free form string to describe the type of project
+    /// Just for display purposes
+    #[serde(rename = "type")]
+    type_str: Option<String>,
 }
 
 fn default_no_parent_dir() -> bool {
