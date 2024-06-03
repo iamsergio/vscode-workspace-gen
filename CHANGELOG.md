@@ -2,6 +2,12 @@
 
 
 
+## [3.1.1] - 2024-06-03
+
+### 🐛 Bug Fixes
+
+- Remove reqwest as dependency
+
 ## [3.1.0] - 2024-06-03
 
 ### 🚀 Features
