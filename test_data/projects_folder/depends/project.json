@@ -1,0 +1,6 @@
+{
+    "description" : "Tests depends",
+    "depends" : [
+        "a"
+    ]
+}

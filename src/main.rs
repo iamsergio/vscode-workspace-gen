@@ -48,7 +48,7 @@ fn handle_projects_usecase() {
             if let Some(proj) = proj {
                 let output_filename = args.output_filename.clone();
                 process::exit(
-                    match project::create_project(proj.as_str(), output_filename) {
+                    match project::create_project_with_id(proj.as_str(), output_filename) {
                         Ok(_) => 0,
                         Err(e) => {
                             eprintln!("Error: {}", e);

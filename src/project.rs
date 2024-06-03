@@ -69,6 +69,9 @@ pub struct Project {
     /// Just for display purposes
     #[serde(rename = "type")]
     type_str: Option<String>,
+
+    /// List of other projects we depend on, such as .clang-format and other simple files
+    depends: Option<Vec<String>>,
 }
 
 fn default_no_parent_dir() -> bool {
@@ -162,10 +165,13 @@ fn absolute_path(output_dir: &str) -> PathBuf {
     }
 }
 
-/// Creates a new folder with the project
-pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
+pub fn create_project_with_id(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
     let project = get_project(project_id)?;
+    create_project(project, output_dir)
+}
 
+/// Creates a new folder with the project
+pub fn create_project(project: Project, output_dir: Option<String>) -> Result<(), String> {
     if project.no_parent_dir {
         return create_project_from_contents(project, output_dir);
     }
@@ -188,6 +194,12 @@ pub fn create_project(project_id: &str, output_dir: Option<String>) -> Result<()
     }
 
     copy_dir::copy_dir(project.path.parent().unwrap(), &absolute_target_path).unwrap();
+
+    for dep in project.depends.unwrap_or_default() {
+        let dep_proj = get_project(dep.as_str())?;
+        let absolute_target_path_str = String::from(absolute_target_path.to_str().unwrap());
+        create_project(dep_proj, Some(absolute_target_path_str))?;
+    }
 
     Ok(())
 }
@@ -242,15 +254,16 @@ mod tests {
         let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         d.push("test_data/projects_folder");
         let result = list_folder(&d).unwrap();
-        assert_eq!(result.len(), 3);
+        assert_eq!(result.len(), 4);
 
         // sort result based on description
         let mut result = result;
         result.sort_by(|a, b| a.description.cmp(&b.description));
 
-        assert_eq!(result[0].description, "desc1");
-        assert_eq!(result[1].description, "desc2");
-        assert_eq!(result[2].description, "desc3");
+        assert_eq!(result[0].description, "Tests depends");
+        assert_eq!(result[1].description, "desc1");
+        assert_eq!(result[2].description, "desc2");
+        assert_eq!(result[3].description, "desc3");
 
         for r in result.iter() {
             assert_eq!(r.path.file_name().unwrap(), "project.json");
@@ -276,7 +289,7 @@ mod tests {
     fn test_create_project() {
         set_root_folder();
 
-        create_project("c/d", None).unwrap();
+        create_project_with_id("c/d", None).unwrap();
 
         let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         d.push("d");
@@ -284,7 +297,7 @@ mod tests {
         assert!(d.exists());
         std::fs::remove_dir_all(d).unwrap();
 
-        create_project("c/d", Some("foo".to_string())).unwrap();
+        create_project_with_id("c/d", Some("foo".to_string())).unwrap();
         let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         d.push("foo");
         assert!(d.exists());
@@ -294,7 +307,7 @@ mod tests {
     #[test]
     fn test_create_project_noparent() {
         set_root_folder();
-        create_project("a", None).unwrap();
+        create_project_with_id("a", None).unwrap();
 
         let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         d.push("a");
@@ -304,5 +317,25 @@ mod tests {
         d.push("this.txt");
         assert!(d.exists());
         std::fs::remove_file(d).unwrap();
+    }
+
+    #[test]
+    fn test_create_project_depends() {
+        set_root_folder();
+        create_project_with_id("depends", None).unwrap();
+
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("depends");
+        assert!(d.exists());
+
+        d.push("foo.txt");
+        assert!(d.exists());
+
+        d.pop();
+        d.push("this.txt");
+        assert!(d.exists());
+        d.pop();
+
+        std::fs::remove_dir_all(d).unwrap();
     }
 }
