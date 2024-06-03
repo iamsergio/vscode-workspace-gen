@@ -2,6 +2,17 @@
 
 
 
+## [3.1.0] - 2024-06-03
+
+### 🚀 Features
+
+- Display a "type" column when listing projects
+- Add "depends" json field
+
+### ⚙️ Miscellaneous Tasks
+
+- Cargo update
+
 ## [3.0.0] - 2024-06-01
 
 ### 🚀 Features
