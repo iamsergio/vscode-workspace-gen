@@ -2,6 +2,12 @@
 
 
 
+## [3.1.2] - 2024-07-01
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Cargo.lock dependencies
+
 ## [3.1.1] - 2024-06-03
 
 ### 🐛 Bug Fixes
