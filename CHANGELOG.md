@@ -2,6 +2,12 @@
 
 
 
+## [3.1.2] - 2024-12-23
+
+### 🐛 Bug Fixes
+
+- Make clippy happy which fixes CI
+
 ## [3.1.1] - 2024-06-03
 
 ### 🐛 Bug Fixes
