@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 /// Provides some extra convenience for Qt
-
 pub fn suggest_needed_env_vars(template_contents: &str) {
     // create a string to string map, where key is env name and value is the message
     let env_vars = vec![
