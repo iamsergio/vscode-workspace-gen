@@ -2,6 +2,16 @@
 
 
 
+## [3.1.2] - 2025-02-02
+
+### 🐛 Bug Fixes
+
+- Make clippy happy which fixes CI
+
+### ⚙️ Miscellaneous Tasks
+
+- Cargo update
+
 ## [3.1.1] - 2024-06-03
 
 ### 🐛 Bug Fixes
