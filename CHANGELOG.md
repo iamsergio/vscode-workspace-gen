@@ -2,6 +2,12 @@
 
 
 
+## [3.1.3] - 2025-03-31
+
+### ⚙️ Miscellaneous Tasks
+
+- Minor renaming
+
 ## [3.1.2] - 2025-02-02
 
 ### 🐛 Bug Fixes
