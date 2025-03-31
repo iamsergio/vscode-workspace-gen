@@ -16,7 +16,7 @@ mod tests;
 struct Args {
     // Add -o option to specify output file
     #[arg(short, long)]
-    output_filename: Option<String>,
+    output_name: Option<String>,
 
     #[arg(short, long)]
     template_filename: Option<String>,
@@ -46,9 +46,10 @@ fn handle_projects_usecase() {
     if let Ok(args) = Args::try_parse() {
         if let Some(proj) = args.projects.create_project {
             if let Some(proj) = proj {
-                let output_filename = args.output_filename.clone();
+                let output_name = args.output_name.clone();
+
                 process::exit(
-                    match project::create_project_with_id(proj.as_str(), output_filename) {
+                    match project::create_project_with_id(proj.as_str(), output_name) {
                         Ok(_) => 0,
                         Err(e) => {
                             eprintln!("Error: {}", e);
@@ -70,7 +71,7 @@ fn handle_projects_usecase() {
 }
 
 fn main() {
-    // Handle --create-project. Exits if handled.
+    // Handle -c, --create-project. Exits if handled.
     handle_projects_usecase();
 
     // Handle the main use case:
@@ -90,8 +91,7 @@ fn main() {
         .clone()
         .expect("You're expected to pass: -t <template_filename>");
 
-    let result: Result<(), workspace::Error> = if let Some(output_filename) = &args.output_filename
-    {
+    let result: Result<(), workspace::Error> = if let Some(output_filename) = &args.output_name {
         // Case 1. User passed -o <output_filename>
         workspace::generate_from_file(
             template_filename,
