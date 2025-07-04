@@ -164,13 +164,25 @@ fn absolute_path(output_dir: &str) -> PathBuf {
 
 pub fn create_project_with_id(project_id: &str, output_dir: Option<String>) -> Result<(), String> {
     let project = get_project(project_id)?;
-    create_project(project, output_dir)
+    create_project(project, output_dir, false)
+}
+
+pub fn create_template_project_with_id(
+    project_id: &str,
+    output_dir: Option<String>,
+) -> Result<(), String> {
+    let project = get_project(project_id)?;
+    create_project(project, output_dir, true)
 }
 
 /// Creates a new folder with the project
-pub fn create_project(project: Project, output_dir: Option<String>) -> Result<(), String> {
+pub fn create_project(
+    project: Project,
+    output_dir: Option<String>,
+    creating_template: bool,
+) -> Result<(), String> {
     if project.is_single_file() {
-        return create_project_from_contents(project, output_dir);
+        return create_project_from_contents(project, output_dir, creating_template);
     }
 
     let absolute_target_path = if let Some(output_dir) = output_dir {
@@ -192,10 +204,13 @@ pub fn create_project(project: Project, output_dir: Option<String>) -> Result<()
 
     copy_dir::copy_dir(project.path.parent().unwrap(), &absolute_target_path).unwrap();
 
-    for dep in project.depends.unwrap_or_default() {
-        let dep_proj = get_project(dep.as_str())?;
-        let absolute_target_path_str = String::from(absolute_target_path.to_str().unwrap());
-        create_project(dep_proj, Some(absolute_target_path_str))?;
+    // Only process dependencies if not creating template
+    if !creating_template {
+        for dep in project.depends.unwrap_or_default() {
+            let dep_proj = get_project(dep.as_str())?;
+            let absolute_target_path_str = String::from(absolute_target_path.to_str().unwrap());
+            create_project(dep_proj, Some(absolute_target_path_str), false)?;
+        }
     }
 
     Ok(())
@@ -207,6 +222,7 @@ pub fn create_project(project: Project, output_dir: Option<String>) -> Result<()
 fn create_project_from_contents(
     project: Project,
     output_dir: Option<String>,
+    creating_template: bool,
 ) -> Result<(), String> {
     let absolute_target_path = if let Some(output_dir) = output_dir {
         absolute_path(output_dir.as_str())
@@ -228,7 +244,8 @@ fn create_project_from_contents(
         let entry = entry.unwrap();
         let path = entry.path();
 
-        if entry.file_name() == "project.json" {
+        // Skip project.json unless creating template
+        if !creating_template && entry.file_name() == "project.json" {
             continue;
         }
 
@@ -333,6 +350,67 @@ mod tests {
         assert!(d.exists());
         d.pop();
 
+        std::fs::remove_dir_all(d).unwrap();
+    }
+
+    #[test]
+    fn test_create_template_project() {
+        set_root_folder();
+
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("test_template_depends");
+
+        // Clean up if directory exists from previous test
+        if d.exists() {
+            std::fs::remove_dir_all(&d).unwrap();
+        }
+
+        create_template_project_with_id("depends", Some("test_template_depends".to_string()))
+            .unwrap();
+        assert!(d.exists());
+
+        // Should have foo.txt from the project
+        d.push("foo.txt");
+        assert!(d.exists());
+
+        d.pop();
+        d.push("project.json");
+        assert!(d.exists());
+
+        // Should NOT have this.txt because dependencies are not processed
+        d.pop();
+        d.push("this.txt");
+        assert!(!d.exists());
+
+        d.pop();
+        std::fs::remove_dir_all(d).unwrap();
+    }
+
+    #[test]
+    fn test_create_template_project_single_file() {
+        set_root_folder();
+
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("test_template_single_file");
+
+        // Clean up if directory exists from previous test
+        if d.exists() {
+            std::fs::remove_dir_all(&d).unwrap();
+        }
+
+        // Create test directory
+        std::fs::create_dir(&d).unwrap();
+
+        create_template_project_with_id("a", Some(d.to_str().unwrap().to_string())).unwrap();
+
+        d.push("this.txt");
+        assert!(d.exists());
+
+        d.pop();
+        d.push("project.json");
+        assert!(d.exists());
+
+        d.pop();
         std::fs::remove_dir_all(d).unwrap();
     }
 }

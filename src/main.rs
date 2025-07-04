@@ -29,6 +29,9 @@ struct Args {
 struct CreateProjArgs {
     #[arg(short, long)]
     create_project: Option<Option<String>>,
+
+    #[arg(short = 'a', long)]
+    create_template_project: Option<Option<String>>,
 }
 
 // suggestion is relative to cwd
@@ -67,11 +70,38 @@ fn handle_projects_usecase() {
                 });
             }
         }
+
+        if let Some(proj) = args.projects.create_template_project {
+            if let Some(proj) = proj {
+                let output_name = args.output_name.clone();
+
+                process::exit(
+                    match project::create_template_project_with_id(proj.as_str(), output_name) {
+                        Ok(_) => {
+                            println!("Please edit project.json");
+                            0
+                        }
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                            1
+                        }
+                    },
+                );
+            } else {
+                process::exit(match project::print_projects() {
+                    Ok(_) => 0,
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                        1
+                    }
+                });
+            }
+        }
     }
 }
 
 fn main() {
-    // Handle -c, --create-project. Exits if handled.
+    // Handle -c, --create-project and -a, --create-template-project. Exits if handled.
     handle_projects_usecase();
 
     // Handle the main use case:
@@ -145,5 +175,106 @@ fn main() {
 
             process::exit(-1);
         }
+    }
+}
+
+#[cfg(test)]
+mod cli_tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    fn set_test_env() {
+        let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("test_data/projects_folder");
+        std::env::set_var("VSCODE_WORKSPACE_GEN_FOLDERS", d.to_str().unwrap());
+    }
+
+    #[test]
+    fn test_create_template_project_cli() {
+        set_test_env();
+
+        // Test parsing of -a option
+        let args = Args::try_parse_from(&["vscode-workspace-gen", "-a", "depends"]).unwrap();
+        assert!(args.projects.create_template_project.is_some());
+        assert_eq!(
+            args.projects.create_template_project.unwrap().unwrap(),
+            "depends"
+        );
+
+        // Test parsing of --create-template-project option
+        let args =
+            Args::try_parse_from(&["vscode-workspace-gen", "--create-template-project", "a"])
+                .unwrap();
+        assert!(args.projects.create_template_project.is_some());
+        assert_eq!(args.projects.create_template_project.unwrap().unwrap(), "a");
+
+        // Test that create_template_project_with_id works correctly
+        let mut test_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        test_dir.push("cli_test_output");
+
+        // Clean up if exists
+        if test_dir.exists() {
+            std::fs::remove_dir_all(&test_dir).unwrap();
+        }
+
+        // Test the function directly
+        let result = project::create_template_project_with_id(
+            "depends",
+            Some("cli_test_output".to_string()),
+        );
+        assert!(result.is_ok());
+
+        // Verify the output
+        assert!(test_dir.exists());
+
+        let project_json = test_dir.join("project.json");
+        assert!(project_json.exists());
+
+        let foo_txt = test_dir.join("foo.txt");
+        assert!(foo_txt.exists());
+
+        // Verify dependencies were NOT processed (no this.txt)
+        let this_txt = test_dir.join("this.txt");
+        assert!(!this_txt.exists());
+
+        // Clean up
+        std::fs::remove_dir_all(test_dir).unwrap();
+    }
+
+    #[test]
+    fn test_create_template_project_single_file_cli() {
+        set_test_env();
+
+        // Test single file project with -a option
+        let args = Args::try_parse_from(&["vscode-workspace-gen", "-a", "a"]).unwrap();
+        assert!(args.projects.create_template_project.is_some());
+
+        // Use a dedicated test directory to avoid conflicts
+        let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let test_dir = manifest_dir.join("cli_test_single_file");
+
+        // Clean up if exists
+        if test_dir.exists() {
+            std::fs::remove_dir_all(&test_dir).unwrap();
+        }
+
+        // Create test directory
+        std::fs::create_dir(&test_dir).unwrap();
+
+        // Test the function with the test directory
+        let result = project::create_template_project_with_id(
+            "a",
+            Some(test_dir.to_str().unwrap().to_string()),
+        );
+        assert!(result.is_ok());
+
+        // Verify both files were created (including project.json)
+        let this_txt = test_dir.join("this.txt");
+        let project_json = test_dir.join("project.json");
+        assert!(this_txt.exists());
+        assert!(project_json.exists());
+
+        // Clean up
+        std::fs::remove_dir_all(test_dir).unwrap();
     }
 }
