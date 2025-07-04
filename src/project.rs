@@ -62,9 +62,6 @@ pub struct Project {
 
     description: String,
 
-    #[serde(default = "default_no_parent_dir")]
-    no_parent_dir: bool,
-
     /// free form string to describe the type of project
     /// Just for display purposes
     #[serde(rename = "type")]
@@ -72,10 +69,6 @@ pub struct Project {
 
     /// List of other projects we depend on, such as .clang-format and other simple files
     depends: Option<Vec<String>>,
-}
-
-fn default_no_parent_dir() -> bool {
-    false
 }
 
 impl Project {
@@ -112,6 +105,10 @@ impl Project {
             .parent()
             .map(|p| p.to_path_buf())
             .ok_or("Could not get parent folder".to_string())
+    }
+
+    fn is_single_file(&self) -> bool {
+        self.type_str == Some("single_file".to_string())
     }
 }
 
@@ -172,7 +169,7 @@ pub fn create_project_with_id(project_id: &str, output_dir: Option<String>) -> R
 
 /// Creates a new folder with the project
 pub fn create_project(project: Project, output_dir: Option<String>) -> Result<(), String> {
-    if project.no_parent_dir {
+    if project.is_single_file() {
         return create_project_from_contents(project, output_dir);
     }
 
@@ -186,7 +183,7 @@ pub fn create_project(project: Project, output_dir: Option<String>) -> Result<()
         )
     };
 
-    if absolute_target_path.exists() {
+    if !project.is_single_file() && absolute_target_path.exists() {
         return Err(std::format!(
             "Target path already exists {}",
             absolute_target_path.display()
