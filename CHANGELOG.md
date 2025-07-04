@@ -2,6 +2,16 @@
 
 
 
+## [3.2.0] - 2025-07-04
+
+### 🚀 Features
+
+- Allow to create template from template
+
+### 🐛 Bug Fixes
+
+- Don't nag about existing directory when copying single_file
+
 ## [3.1.3] - 2025-03-31
 
 ### ⚙️ Miscellaneous Tasks
