@@ -2,6 +2,13 @@
 
 
 
+## [3.2.1] - 2026-05-02
+
+### ⚙️ Miscellaneous Tasks
+
+- Update Cargo.lock dependencies
+
+
 ## [3.2.0] - 2025-07-04
 
 ### 🚀 Features
